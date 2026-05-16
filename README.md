@@ -4,7 +4,7 @@
 
 🌐 **Canlı Demo:** [notkutum.com](https://notkutum.com)
 
-![Landing](screenshots/1-landing.png)
+![Landing](KisiselNotYonetimSistemi/screenshots/1-landing.png)
 
 ---
 
@@ -52,16 +52,16 @@ KisiselNotYonetimSistemi/
 ## 📸 Ekran Görüntüleri
 
 ### Dashboard
-![Dashboard](screenshots/2-dashboard.png)
+![Dashboard](KisiselNotYonetimSistemi/screenshots/2-dashboard.png)
 
 ### Yeni Not Ekle
-![Yeni Not](screenshots/3-yeni-not.png)
+![Yeni Not](KisiselNotYonetimSistemi/screenshots3-yeni-not.png)
 
 ### Kategoriler
-![Kategoriler](screenshots/4-kategoriler.png)
+![Kategoriler](KisiselNotYonetimSistemi/screenshots4-kategoriler.png)
 
 ### Yeni Kategori
-![Yeni Kategori](screenshots/5-yeni-kategori.png)
+![Yeni Kategori](KisiselNotYonetimSistemi/screenshots5-yeni-kategori.png)
 
 ---
 
