@@ -1,0 +1,280 @@
+﻿@{
+    ViewData["Title"] = "Dashboard";
+}
+
+<style>
+    .welcome-bar {
+        background: linear-gradient(135deg, #ff4e50 0%, #f9d423 100%);
+        border-radius: 16px;
+        padding: 24px 32px;
+        color: white;
+        margin-bottom: 28px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+    .welcome-bar h5 { margin: 0; font-weight: 700; font-size: 1.2rem; }
+    .welcome-bar p  { margin: 4px 0 0; opacity: 0.85; font-size: 0.9rem; }
+
+    .quick-add-btn {
+        background: white;
+        color: #6366f1;
+        border: none;
+        border-radius: 10px;
+        padding: 10px 20px;
+        font-weight: 600;
+        font-size: 0.9rem;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        transition: opacity 0.15s;
+    }
+    .quick-add-btn:hover { opacity: 0.9; color: #6366f1; }
+
+    .stat-card {
+        border-radius: 16px;
+        border: 1px solid var(--card-border) !important;
+        background: var(--card-bg) !important;
+        transition: transform 0.2s;
+    }
+    .stat-card:hover { transform: translateY(-3px); }
+
+    .stat-icon {
+        width: 52px;
+        height: 52px;
+        border-radius: 13px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+        flex-shrink: 0;
+    }
+
+    .stat-label {
+        font-size: 0.78rem;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        color: var(--text-muted);
+        font-weight: 600;
+        margin-bottom: 2px;
+    }
+
+    .stat-value {
+        font-size: 1.9rem;
+        font-weight: 700;
+        line-height: 1.1;
+        color: var(--text);
+    }
+
+    .stat-value-sm {
+        font-size: 1.1rem;
+        font-weight: 700;
+        line-height: 1.2;
+        color: var(--text);
+    }
+
+    .notes-card {
+        border-radius: 16px;
+        border: 1px solid var(--card-border) !important;
+        background: var(--card-bg) !important;
+    }
+
+    .section-title {
+        font-size: 0.82rem;
+        font-weight: 600;
+        color: var(--text-muted);
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        margin-bottom: 16px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .note-item {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 14px 16px;
+        border-radius: 10px;
+        border: 1px solid var(--card-border);
+        background: var(--sidebar-hover);
+        margin-bottom: 8px;
+        text-decoration: none;
+        color: inherit;
+        transition: border-color 0.15s, background 0.15s;
+    }
+    .note-item:hover {
+        border-color: #7c6fff40;
+        background: var(--card-bg);
+        color: inherit;
+    }
+
+    .note-title {
+        font-weight: 600;
+        font-size: 0.92rem;
+        color: var(--text);
+        margin-bottom: 2px;
+    }
+
+    .note-preview {
+        font-size: 0.82rem;
+        color: var(--text-muted);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 480px;
+    }
+
+    .badge-date {
+        background: #7c6fff18;
+        color: #9d8fff;
+        border-radius: 20px;
+        padding: 3px 12px;
+        font-size: 0.75rem;
+        font-weight: 500;
+        white-space: nowrap;
+        flex-shrink: 0;
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 48px 0;
+        color: var(--text-muted);
+    }
+    .empty-state i {
+        font-size: 2.5rem;
+        margin-bottom: 12px;
+        display: block;
+        opacity: 0.4;
+    }
+    .empty-state a { color: #7c6fff; text-decoration: none; }
+    .empty-state a:hover { text-decoration: underline; }
+</style>
+
+<!-- Hoş geldin banner -->
+<div class="welcome-bar">
+    <div>
+        <h5>Hoş geldin, @Context.Session.GetString("Username")! 👋</h5>
+        <p>Bugün ne not almak istersin?</p>
+    </div>
+    <a asp-controller="Note" asp-action="Add" class="quick-add-btn">
+        <i class="bi bi-plus-lg"></i> Yeni Not
+    </a>
+</div>
+
+<!-- İstatistik Kartları -->
+<div class="row g-3 mb-4">
+    <div class="col-6 col-md-4">
+        <div class="card stat-card p-1 border-0 h-100">
+            <div class="card-body d-flex align-items-center gap-3 p-3">
+                <div class="stat-icon" style="background:#6366f118">
+                    <i class="bi bi-sticky-fill" style="color:#7c6fff"></i>
+                </div>
+                <div>
+                    <div class="stat-label">Toplam Not</div>
+                    <div class="stat-value">@ViewBag.TotalNotes</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-6 col-md-4">
+        <div class="card stat-card p-1 border-0 h-100">
+            <div class="card-body d-flex align-items-center gap-3 p-3">
+                <div class="stat-icon" style="background:#10b98118">
+                    <i class="bi bi-tags-fill" style="color:#10b981"></i>
+                </div>
+                <div>
+                    <div class="stat-label">Toplam Kategori</div>
+                    <div class="stat-value">@ViewBag.TotalCategories</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-12 col-md-4">
+        <div class="card stat-card p-1 border-0 h-100">
+            <div class="card-body d-flex align-items-center gap-3 p-3">
+                <div class="stat-icon" style="background:#f59e0b18">
+                    <i class="bi bi-person-fill" style="color:#f59e0b"></i>
+                </div>
+                <div>
+                    <div class="stat-label">Kullanıcı</div>
+                    <div class="stat-value-sm">@Context.Session.GetString("Username")</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Son Eklenen Notlar -->
+<div class="card notes-card border-0">
+    <div class="card-body p-4">
+        <div class="section-title">
+            <i class="bi bi-clock-history" style="color:#7c6fff"></i>
+            Son Eklenen Notlar
+        </div>
+
+        @if (ViewBag.RecentNotes != null && ViewBag.RecentNotes.Count > 0)
+        {
+            @foreach (var note in ViewBag.RecentNotes)
+            {
+                <a href="/Note/Detail/@note.NoteID" class="note-item">
+                    <div style="overflow:hidden; flex:1; min-width:0;">
+                        <div class="note-title">@note.Title</div>
+                        <div class="note-preview">
+                            @note.Content?.Substring(0, Math.Min(80, note.Content?.Length ?? 0))
+                        </div>
+                    </div>
+                    <span class="badge-date ms-3">
+                        @note.CreatedDate.ToString("dd MMM yyyy")
+                    </span>
+                </a>
+            }
+        }
+        else
+        {
+            <div class="empty-state">
+                <i class="bi bi-journal-x"></i>
+                Henüz not eklenmemiş.
+                <a asp-controller="Note" asp-action="Add" class="d-block mt-2">
+                    İlk notunu ekle →
+                </a>
+            </div>
+        }
+    </div>
+</div>
+<!-- Kategori Grafik -->
+<div class="card notes-card border-0 mt-3">
+    <div class="card-body p-4">
+        <div class="section-title">
+            <i class="bi bi-pie-chart-fill" style="color:#7c6fff"></i>
+            Kategori Dağılımı
+        </div>
+        <div style="max-width:320px; margin:0 auto;">
+            <canvas id="kategoriGrafik"></canvas>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    const ctx = document.getElementById('kategoriGrafik').getContext('2d');
+    new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+            labels: @Html.Raw(Json.Serialize(ViewBag.KategoriLabels)),
+            datasets: [{
+                data: @Html.Raw(Json.Serialize(ViewBag.KategoriData)),
+                backgroundColor: ['#6366f1','#10b981','#f59e0b','#ef4444','#8b5cf6','#3b82f6'],
+                borderWidth: 0
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: { position: 'bottom' }
+            }
+        }
+    });
+</script>

@@ -1,0 +1,199 @@
+﻿@model List<KisiselNotYonetimSistemi.Entity.Concrete.Note>
+@{
+    ViewData["Title"] = "Arama";
+}
+
+<style>
+    .search-box-card {
+        border: none;
+        border-radius: 16px;
+        max-width: 640px;
+        margin-bottom: 28px;
+    }
+    .search-box-card .card-body { padding: 24px; }
+    .search-input {
+        border-radius: 10px 0 0 10px;
+        border: 1.5px solid var(--input-border);
+        border-right: none;
+        padding: 12px 16px;
+        font-size: 0.95rem;
+        background: var(--input-bg);
+        color: var(--input-text);
+        width: 100%;
+        outline: none;
+        transition: border-color 0.2s;
+    }
+    .search-input:focus { border-color: #6366f1; }
+    .btn-search {
+        background: linear-gradient(135deg, #6366f1, #8b5cf6);
+        border: none;
+        border-radius: 0 10px 10px 0;
+        padding: 12px 24px;
+        font-weight: 600;
+        color: white;
+        cursor: pointer;
+        transition: opacity 0.2s;
+    }
+    .btn-search:hover { opacity: 0.9; }
+    .result-title {
+        font-size: 0.88rem;
+        color: var(--text-muted);
+        margin-bottom: 20px;
+    }
+    .result-title span { font-weight: 700; color: #6366f1; }
+    .note-card {
+        border: none;
+        border-radius: 16px;
+        transition: transform 0.2s, box-shadow 0.2s;
+        background: var(--card-bg);
+        border: 1px solid var(--card-border) !important;
+    }
+    .note-card:hover { transform: translateY(-4px); box-shadow: 0 12px 32px rgba(0,0,0,0.1) !important; }
+    .note-card .card-body { padding: 24px; }
+    .note-title { font-weight: 700; font-size: 0.97rem; margin-bottom: 8px; color: var(--text); }
+    .note-preview { font-size: 0.84rem; color: var(--text-muted); margin-bottom: 16px; line-height: 1.6; }
+    .btn-detail {
+        background: rgba(99,102,241,0.1);
+        color: #6366f1;
+        border: none;
+        border-radius: 8px;
+        padding: 7px 16px;
+        font-size: 0.82rem;
+        font-weight: 600;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        transition: opacity 0.15s;
+    }
+    .btn-detail:hover { opacity: 0.8; color: #6366f1; }
+    .empty-state { text-align: center; padding: 60px 0; color: var(--text-muted); }
+    .empty-state i { font-size: 3rem; display: block; margin-bottom: 12px; opacity: 0.4; }
+    .highlight { background: rgba(99,102,241,0.2); color: #6366f1; border-radius: 3px; padding: 0 3px; font-weight: 600; }
+    .searching-badge {
+        display: none;
+        font-size: 0.8rem;
+        color: var(--text-muted);
+        margin-top: 8px;
+    }
+</style>
+
+<div class="card search-box-card shadow-sm">
+    <div class="card-body">
+        <div style="display:flex;">
+            <input type="text" id="searchInput" class="search-input"
+                   placeholder="Başlık veya içerikte ara..."
+                   value="@ViewBag.Query" autofocus />
+            <button class="btn-search" onclick="doSearch()">
+                <i class="bi bi-search me-1"></i> Ara
+            </button>
+        </div>
+        <div class="searching-badge" id="searchingBadge">
+            <i class="bi bi-hourglass-split me-1"></i> Aranıyor...
+        </div>
+    </div>
+</div>
+
+<div id="resultTitle" class="result-title" style="display:none"></div>
+<div id="resultsContainer" class="row g-4"></div>
+
+<div id="emptyState" class="empty-state" style="display:none">
+    <i class="bi bi-search"></i>
+    <p>Sonuç bulunamadı.</p>
+</div>
+
+<script>
+    let searchTimer = null;
+    const input = document.getElementById('searchInput');
+    const resultsContainer = document.getElementById('resultsContainer');
+    const resultTitle = document.getElementById('resultTitle');
+    const emptyState = document.getElementById('emptyState');
+    const searchingBadge = document.getElementById('searchingBadge');
+
+    input.addEventListener('input', function () {
+        clearTimeout(searchTimer);
+        const q = this.value.trim();
+
+        if (q.length === 0) {
+            resultsContainer.innerHTML = '';
+            resultTitle.style.display = 'none';
+            emptyState.style.display = 'none';
+            searchingBadge.style.display = 'none';
+            return;
+        }
+
+        if (q.length < 2) return;
+
+        searchingBadge.style.display = 'block';
+
+        searchTimer = setTimeout(() => {
+            doSearch();
+        }, 300);
+    });
+
+    input.addEventListener('keydown', function (e) {
+        if (e.key === 'Enter') {
+            clearTimeout(searchTimer);
+            doSearch();
+        }
+    });
+
+    function doSearch() {
+        const q = input.value.trim();
+        if (!q) return;
+
+        searchingBadge.style.display = 'block';
+
+        fetch(`/Note/SearchJson?q=${encodeURIComponent(q)}`)
+            .then(r => r.json())
+            .then(notes => {
+                searchingBadge.style.display = 'none';
+                renderResults(notes, q);
+            })
+            .catch(() => {
+                searchingBadge.style.display = 'none';
+            });
+    }
+
+    function highlight(text, q) {
+        if (!text) return '';
+        const regex = new RegExp(`(${q.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi');
+        return text.replace(regex, '<span class="highlight">$1</span>');
+    }
+
+    function renderResults(notes, q) {
+        resultsContainer.innerHTML = '';
+        resultTitle.style.display = 'block';
+        resultTitle.innerHTML = `"<span>${q}</span>" için ${notes.length} sonuç bulundu`;
+
+        if (notes.length === 0) {
+            emptyState.style.display = 'block';
+            return;
+        }
+
+        emptyState.style.display = 'none';
+
+        notes.forEach(note => {
+            const preview = note.content ? note.content.substring(0, 100) + (note.content.length > 100 ? '...' : '') : '';
+            const col = document.createElement('div');
+            col.className = 'col-md-4';
+            col.innerHTML = `
+                <div class="card note-card h-100">
+                    <div class="card-body">
+                        <div class="note-title">${highlight(note.title, q)}</div>
+                        <div class="note-preview">${highlight(preview, q)}</div>
+                        <a href="/Note/Detail/${note.noteID}" class="btn-detail">
+                            <i class="bi bi-eye"></i> Görüntüle
+                        </a>
+                    </div>
+                </div>`;
+            resultsContainer.appendChild(col);
+        });
+    }
+
+    // Sayfa açılınca önceki sorgu varsa göster
+    window.addEventListener('load', () => {
+        const q = input.value.trim();
+        if (q.length >= 2) doSearch();
+    });
+</script>

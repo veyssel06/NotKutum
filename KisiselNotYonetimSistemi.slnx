@@ -1,0 +1,6 @@
+<Solution>
+  <Project Path="KisiselNotYonetimSistemi.Business/KisiselNotYonetimSistemi.Business.csproj" Id="fc61f32d-c962-4923-827c-76e2ce81abcd" />
+  <Project Path="KisiselNotYonetimSistemi.DataAccess/KisiselNotYonetimSistemi.DataAccess.csproj" Id="3d46f9de-8dda-485a-8b56-2105f38542d7" />
+  <Project Path="KisiselNotYonetimSistemi.Entity/KisiselNotYonetimSistemi.Entity.csproj" Id="63bcbd0a-c469-4d41-9163-2b3ada2aed48" />
+  <Project Path="KisiselNotYonetimSistemi/KisiselNotYonetimSistemi.csproj" />
+</Solution>

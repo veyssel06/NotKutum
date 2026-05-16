@@ -1,0 +1,122 @@
+﻿@model List<KisiselNotYonetimSistemi.Entity.Concrete.User>
+@{
+    ViewData["Title"] = "Kullanıcılar";
+}
+
+<style>
+    .users-table th {
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 0.8px;
+        color: var(--text-muted);
+        font-weight: 600;
+        border-bottom: 1px solid var(--card-border) !important;
+        padding: 12px 16px;
+    }
+    .users-table td {
+        padding: 14px 16px;
+        font-size: 0.88rem;
+        vertical-align: middle;
+        border-bottom: 1px solid var(--card-border) !important;
+    }
+    .users-table tr:last-child td { border-bottom: none !important; }
+    .badge-role {
+        border-radius: 20px;
+        padding: 3px 12px;
+        font-size: 0.75rem;
+        font-weight: 600;
+    }
+    .badge-admin { background: rgba(108,99,255,0.15); color: #6c63ff; }
+    .badge-user  { background: rgba(16,185,129,0.15);  color: #10b981; }
+    .badge-banned { background: rgba(239,68,68,0.15); color: #ef4444; }
+    .btn-ban   { background: rgba(239,68,68,0.1);  color: #ef4444;  border:none; border-radius:8px; padding:5px 14px; font-size:0.82rem; font-weight:500; text-decoration:none; }
+    .btn-unban { background: rgba(16,185,129,0.1); color: #10b981; border:none; border-radius:8px; padding:5px 14px; font-size:0.82rem; font-weight:500; text-decoration:none; }
+    .btn-ban:hover   { opacity: 0.8; color: #ef4444; }
+    .btn-unban:hover { opacity: 0.8; color: #10b981; }
+    .page-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:24px; }
+    .page-header h5 { font-weight:700; font-size:1.1rem; margin:0; }
+    .user-avatar {
+        width: 34px; height: 34px;
+        border-radius: 10px;
+        background: rgba(108,99,255,0.15);
+        color: #6c63ff;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.9rem;
+        font-weight: 700;
+        margin-right: 10px;
+    }
+</style>
+
+<div class="page-header">
+    <h5><i class="bi bi-people me-2"></i>Kullanıcılar</h5>
+    <a asp-action="Index" class="btn btn-outline-secondary btn-sm rounded-pill">
+        <i class="bi bi-arrow-left me-1"></i> Admin Panel
+    </a>
+</div>
+
+<div class="card">
+    <div class="card-body p-0">
+        <table class="table users-table mb-0">
+            <thead>
+                <tr>
+                    <th>Kullanıcı</th>
+                    <th>E-posta</th>
+                    <th>Rol</th>
+                    <th>Durum</th>
+                    <th>İşlem</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var user in Model)
+                {
+                    <tr>
+                        <td>
+                            <span class="user-avatar">@user.Username[0].ToString().ToUpper()</span>
+                            @user.Username
+                        </td>
+                        <td style="color:var(--text-muted)">@user.Email</td>
+                        <td>
+                            <span class="badge-role @(user.Role == "admin" ? "badge-admin" : "badge-user")">
+                                @user.Role
+                            </span>
+                        </td>
+                        <td>
+                            @if (user.UserStatus)
+                            {
+                                <span class="badge-role badge-user">Aktif</span>
+                            }
+                            else
+                            {
+                                <span class="badge-role badge-banned">Banlı</span>
+                            }
+                        </td>
+                        <td>
+                            @if (user.Role != "admin")
+                            {
+                                @if (user.UserStatus)
+                                {
+                                    <a href="/Admin/Ban/@user.UserID" class="btn-ban"
+                                        onclick="event.preventDefault(); showConfirm('@user.Username banlanacak, emin misiniz?', this.href, 'warning')">
+                                        <i class="bi bi-slash-circle me-1"></i>Banla
+                                    </a>
+                                }
+                                else
+                                {
+                                    <a asp-action="Unban" asp-route-id="@user.UserID" class="btn-unban">
+                                        <i class="bi bi-check-circle me-1"></i>Ban Kaldır
+                                    </a>
+                                }
+                            }
+                            else
+                            {
+                                <span style="color:var(--text-muted);font-size:0.8rem;">—</span>
+                            }
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

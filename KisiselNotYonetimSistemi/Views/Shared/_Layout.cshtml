@@ -1,0 +1,557 @@
+﻿<!DOCTYPE html>
+<html lang="tr" data-theme="dark">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - Kişisel Not Yönetim Sistemi</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" />
+    <style>
+        :root[data-theme="dark"] {
+            --bg: #0f0f1a;
+            --sidebar-bg: #13131f;
+            --sidebar-border: #1e1e35;
+            --sidebar-text: #8b8ba7;
+            --sidebar-hover: #1e1e35;
+            --sidebar-active: #6c63ff;
+            --content-bg: #0f0f1a;
+            --card-bg: #16162a;
+            --card-border: #1e1e35;
+            --topbar-bg: #16162a;
+            --text: #e2e2f0;
+            --text-muted: #6b6b8a;
+            --input-bg: #1e1e35;
+            --input-border: #2a2a45;
+            --input-text: #e2e2f0;
+            --btn-primary: #6c63ff;
+            --btn-primary-hover: #5a52e0;
+            --accent: #6c63ff;
+        }
+        :root[data-theme="light"] {
+            --bg: #f5f5ff;
+            --sidebar-bg: #ffffff;
+            --sidebar-border: #e8e8f0;
+            --sidebar-text: #6b6b8a;
+            --sidebar-hover: #f0f0ff;
+            --sidebar-active: #6c63ff;
+            --content-bg: #f5f5ff;
+            --card-bg: #ffffff;
+            --card-border: #e8e8f0;
+            --topbar-bg: #ffffff;
+            --text: #1a1a2e;
+            --text-muted: #6b6b8a;
+            --input-bg: #f8f8ff;
+            --input-border: #d0d0e8;
+            --input-text: #1a1a2e;
+            --btn-primary: #6c63ff;
+            --btn-primary-hover: #5a52e0;
+            --accent: #6c63ff;
+        }
+
+        * { transition: background-color 0.2s, color 0.2s, border-color 0.2s; box-sizing: border-box; }
+
+        body {
+            background: var(--content-bg);
+            color: var(--text);
+            font-family: 'Inter', -apple-system, sans-serif;
+            margin: 0;
+        }
+
+        /* ── SIDEBAR ── */
+        .sidebar {
+            width: 240px;
+            min-height: 100vh;
+            background: var(--sidebar-bg);
+            border-right: 1px solid var(--sidebar-border);
+            position: fixed;
+            top: 0; left: 0;
+            z-index: 200;
+            display: flex;
+            flex-direction: column;
+            transition: transform 0.25s ease;
+        }
+        .sidebar .brand {
+            color: var(--text);
+            font-size: 0.95rem;
+            font-weight: 700;
+            padding: 20px;
+            border-bottom: 1px solid var(--sidebar-border);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .sidebar .brand i { color: var(--accent); font-size: 1.3rem; }
+        .sidebar .nav-link {
+            color: var(--sidebar-text);
+            padding: 10px 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 0.88rem;
+            border-radius: 0;
+            transition: all 0.15s;
+            text-decoration: none;
+        }
+        .sidebar .nav-link:hover { background: var(--sidebar-hover); color: var(--text); }
+        .sidebar .nav-link.active {
+            background: var(--sidebar-hover);
+            color: var(--accent);
+            border-left: 3px solid var(--accent);
+        }
+        .sidebar .nav-link i { font-size: 1rem; width: 18px; }
+        .sidebar .nav-section {
+            color: var(--text-muted);
+            font-size: 0.68rem;
+            text-transform: uppercase;
+            letter-spacing: 1.2px;
+            padding: 16px 20px 6px;
+        }
+        .sidebar .logout-link { color: #ff6b6b !important; }
+        .sidebar .logout-link:hover { background: rgba(255,107,107,0.08) !important; }
+
+        .theme-toggle {
+            margin: auto 20px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: var(--sidebar-hover);
+            border-radius: 10px;
+            padding: 10px 14px;
+            cursor: pointer;
+            border: 1px solid var(--sidebar-border);
+        }
+        .theme-toggle span { font-size: 0.8rem; color: var(--sidebar-text); }
+        .toggle-switch {
+            width: 36px; height: 20px;
+            background: var(--accent);
+            border-radius: 10px;
+            position: relative; cursor: pointer;
+        }
+        .toggle-switch::after {
+            content: '';
+            position: absolute;
+            width: 14px; height: 14px;
+            background: white; border-radius: 50%;
+            top: 3px; left: 3px;
+            transition: left 0.2s;
+        }
+        [data-theme="light"] .toggle-switch::after { left: 19px; }
+
+        /* ── OVERLAY (mobil) ── */
+        .sidebar-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 199;
+        }
+        .sidebar-overlay.active { display: block; }
+
+        /* ── MAIN ── */
+        .main-content {
+            margin-left: 240px;
+            padding: 24px;
+            min-height: 100vh;
+        }
+
+        /* ── TOPBAR ── */
+        .topbar {
+            background: var(--topbar-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 12px;
+            padding: 14px 20px;
+            margin-bottom: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+        }
+        .topbar h6 { color: var(--text); font-size: 0.9rem; white-space: nowrap; }
+        .topbar .user-badge {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.82rem;
+            color: var(--text-muted);
+            background: var(--sidebar-hover);
+            padding: 6px 12px;
+            border-radius: 20px;
+            border: 1px solid var(--card-border);
+            white-space: nowrap;
+        }
+
+        /* hamburger butonu */
+        .hamburger {
+            display: none;
+            background: none;
+            border: none;
+            color: var(--text);
+            font-size: 1.3rem;
+            cursor: pointer;
+            padding: 4px 8px;
+            flex-shrink: 0;
+        }
+
+        /* Cards */
+        .card {
+            background: var(--card-bg) !important;
+            border: 1px solid var(--card-border) !important;
+            color: var(--text);
+        }
+        .card-header {
+            background: var(--card-bg) !important;
+            border-bottom: 1px solid var(--card-border) !important;
+        }
+
+        /* Inputs */
+        .form-control, .form-select {
+            background: var(--input-bg) !important;
+            border: 1px solid var(--input-border) !important;
+            color: var(--input-text) !important;
+            border-radius: 8px;
+        }
+        .form-control:focus, .form-select:focus {
+            border-color: var(--accent) !important;
+            box-shadow: 0 0 0 3px rgba(108,99,255,0.15) !important;
+        }
+        .form-label { color: var(--text-muted); font-size: 0.82rem; font-weight: 500; }
+
+        /* Buttons */
+        .btn-primary {
+            background: var(--btn-primary) !important;
+            border-color: var(--btn-primary) !important;
+        }
+        .btn-primary:hover {
+            background: var(--btn-primary-hover) !important;
+            border-color: var(--btn-primary-hover) !important;
+        }
+
+        /* Table */
+        .table { color: var(--text); }
+        .table-light { background: var(--sidebar-hover) !important; color: var(--text-muted) !important; }
+        .table-hover tbody tr:hover { background: var(--sidebar-hover) !important; color: var(--text); }
+        .table td, .table th { border-color: var(--card-border) !important; }
+
+        /* List group */
+        .list-group-item {
+            background: transparent !important;
+            border-color: var(--card-border) !important;
+            color: var(--text);
+        }
+        .list-group-item:hover { background: var(--sidebar-hover) !important; }
+
+        /* Stat cards */
+        .stat-card {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 16px;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+        .stat-icon {
+            width: 52px; height: 52px;
+            border-radius: 14px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.4rem; flex-shrink: 0;
+        }
+        .stat-label { color: var(--text-muted); font-size: 0.8rem; margin-bottom: 2px; }
+        .stat-value { color: var(--text); font-size: 1.8rem; font-weight: 700; line-height: 1; }
+
+        /* Note cards */
+        .note-card {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 16px;
+            padding: 20px;
+            height: 100%;
+            transition: transform 0.15s, border-color 0.15s;
+        }
+        .note-card:hover { transform: translateY(-2px); border-color: var(--accent); }
+        .note-title { color: var(--text); font-weight: 600; font-size: 0.95rem; margin-bottom: 6px; }
+        .note-preview { color: var(--text-muted); font-size: 0.82rem; margin-bottom: 12px; line-height: 1.5; }
+        .note-date { color: var(--text-muted); font-size: 0.75rem; }
+
+        .alert-danger {
+            background: rgba(255,107,107,0.1) !important;
+            border-color: rgba(255,107,107,0.3) !important;
+            color: #ff6b6b !important;
+        }
+        .text-muted { color: var(--text-muted) !important; }
+
+        /* ── RESPONSIVE ── */
+        @@media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+            .sidebar.open {
+                transform: translateX(0);
+            }
+            .main-content {
+                margin-left: 0;
+                padding: 16px;
+            }
+            .hamburger {
+                display: block;
+            }
+            .topbar {
+                padding: 10px 14px;
+                gap: 8px;
+            }
+            .topbar h6 {
+                font-size: 0.82rem;
+            }
+            /* arama kutusu mobilde gizle, sadece ikon göster */
+            .topbar-search-wrap {
+                display: none !important;
+            }
+            .stat-card {
+                padding: 14px;
+            }
+            .stat-value { font-size: 1.4rem; }
+        }
+
+        @@media (max-width: 480px) {
+            .main-content { padding: 12px; }
+            .note-card { padding: 14px; }
+        }
+    </style>
+</head>
+
+<!-- Confirm Modal -->
+<div id="confirmModal" style="
+    display:none; position:fixed; inset:0;
+    background:rgba(0,0,0,0.6); z-index:9999;
+    align-items:center; justify-content:center;
+    backdrop-filter:blur(4px);
+">
+    <div style="
+        background:var(--card-bg); border:1px solid var(--card-border);
+        border-radius:20px; padding:32px;
+        max-width:380px; width:90%;
+        box-shadow:0 24px 64px rgba(0,0,0,0.4);
+    ">
+        <div style="display:flex;align-items:center;gap:14px;margin-bottom:16px;">
+            <div id="modalIcon" style="width:44px;height:44px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:1.2rem;flex-shrink:0;"></div>
+            <div>
+                <div id="modalTitle" style="font-weight:700;font-size:1rem;color:var(--text);margin-bottom:4px;"></div>
+                <div id="modalMessage" style="font-size:0.85rem;color:var(--text-muted);"></div>
+            </div>
+        </div>
+        <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:24px;">
+            <button onclick="closeConfirm()" style="background:var(--sidebar-hover);border:1px solid var(--card-border);color:var(--text);border-radius:10px;padding:9px 20px;font-size:0.88rem;font-weight:600;cursor:pointer;">İptal</button>
+            <a id="modalConfirmBtn" href="#" style="border-radius:10px;padding:9px 20px;font-size:0.88rem;font-weight:600;text-decoration:none;color:white;display:inline-block;">Onayla</a>
+        </div>
+    </div>
+</div>
+
+<script>
+    function showConfirm(message, href, type = 'danger') {
+        const configs = {
+            danger:  { title: 'Emin misiniz?', iconHtml: '<i class="bi bi-trash3-fill"></i>', iconBg: 'rgba(239,68,68,0.15)', iconColor: '#ef4444', btnBg: 'linear-gradient(135deg,#ef4444,#dc2626)' },
+            archive: { title: 'Arşive Taşı',   iconHtml: '<i class="bi bi-archive-fill"></i>', iconBg: 'rgba(16,185,129,0.15)', iconColor: '#10b981', btnBg: 'linear-gradient(135deg,#10b981,#059669)' },
+            warning: { title: 'Emin misiniz?', iconHtml: '<i class="bi bi-exclamation-triangle-fill"></i>', iconBg: 'rgba(245,158,11,0.15)', iconColor: '#f59e0b', btnBg: 'linear-gradient(135deg,#f59e0b,#d97706)' }
+        };
+        const cfg = configs[type] || configs.danger;
+        document.getElementById('modalIcon').innerHTML = cfg.iconHtml;
+        document.getElementById('modalIcon').style.background = cfg.iconBg;
+        document.getElementById('modalIcon').style.color = cfg.iconColor;
+        document.getElementById('modalTitle').textContent = cfg.title;
+        document.getElementById('modalMessage').textContent = message;
+        document.getElementById('modalConfirmBtn').href = href;
+        document.getElementById('modalConfirmBtn').style.background = cfg.btnBg;
+        document.getElementById('confirmModal').style.display = 'flex';
+    }
+    function closeConfirm() { document.getElementById('confirmModal').style.display = 'none'; }
+    document.getElementById('confirmModal').addEventListener('click', function(e) { if (e.target === this) closeConfirm(); });
+</script>
+
+<body>
+
+@if (Context.Session.GetInt32("UserID") != null)
+{
+    <!-- Overlay -->
+    <div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
+
+    <div class="sidebar" id="sidebar">
+        <div class="brand">
+            <i class="bi bi-journal-bookmark-fill"></i>
+            Not Yönetimi
+        </div>
+        <div class="nav-section">Ana Menü</div>
+        <a class="nav-link" asp-controller="Home" asp-action="Index">
+            <i class="bi bi-speedometer2"></i> Dashboard
+        </a>
+        <a class="nav-link" asp-controller="Note" asp-action="Index">
+            <i class="bi bi-sticky"></i> Notlarım
+        </a>
+        <a class="nav-link" asp-controller="Note" asp-action="Add">
+            <i class="bi bi-plus-circle"></i> Yeni Not
+        </a>
+        <a class="nav-link" asp-controller="Note" asp-action="ArchivedNotes">
+            <i class="bi bi-archive"></i> Arşiv
+        </a>
+        <a class="nav-link" asp-controller="Note" asp-action="Trash">
+            <i class="bi bi-trash"></i> Çöp Kutusu
+        </a>
+        <div class="nav-section">Kategoriler</div>
+        <a class="nav-link" asp-controller="Category" asp-action="Index">
+            <i class="bi bi-tags"></i> Kategoriler
+        </a>
+        <a class="nav-link" asp-controller="Category" asp-action="Add">
+            <i class="bi bi-plus-square"></i> Yeni Kategori
+        </a>
+        @if (Context.Session.GetString("Role") == "admin")
+        {
+            <div class="nav-section">Yönetim</div>
+            <a class="nav-link" asp-controller="Admin" asp-action="Index">
+                <i class="bi bi-shield-lock"></i> Admin Panel
+            </a>
+        }
+        <div class="nav-section">Hesap</div>
+        <a class="nav-link" asp-controller="Profile" asp-action="Index">
+            <i class="bi bi-person-circle"></i> Profilim
+        </a>
+        <a class="nav-link logout-link" asp-controller="Account" asp-action="Logout">
+            <i class="bi bi-box-arrow-left"></i> Çıkış Yap
+        </a>
+        <div class="theme-toggle" onclick="toggleTheme()">
+            <span id="theme-label"><i class="bi bi-moon-stars me-1"></i> Dark Mode</span>
+            <div class="toggle-switch" id="toggle"></div>
+        </div>
+    </div>
+
+    <div class="main-content">
+        <div class="topbar">
+            <button class="hamburger" onclick="openSidebar()" aria-label="Menü">
+                <i class="bi bi-list"></i>
+            </button>
+            <h6 class="mb-0 fw-semibold">@ViewData["Title"]</h6>
+
+            <div class="topbar-search-wrap" style="position:relative; flex:1; max-width:340px; margin:0 16px;">
+                <div style="display:flex; align-items:center; background:var(--input-bg); border:1.5px solid var(--input-border); border-radius:10px; padding:8px 14px; gap:8px;">
+                    <i class="bi bi-search" style="color:var(--text-muted); font-size:0.85rem;"></i>
+                    <input type="text" id="globalSearch"
+                           placeholder="Notlarda ara..."
+                           style="background:transparent; border:none; outline:none; color:var(--input-text); font-size:0.88rem; width:100%;" />
+                </div>
+                <div id="globalResults" style="
+                    display:none; position:absolute;
+                    top:calc(100% + 8px); left:0; right:0;
+                    background:var(--card-bg); border:1px solid var(--card-border);
+                    border-radius:12px; box-shadow:0 16px 48px rgba(0,0,0,0.3);
+                    z-index:999; overflow:hidden; max-height:360px; overflow-y:auto;
+                "></div>
+            </div>
+
+            <div class="user-badge">
+                <i class="bi bi-person-fill"></i>
+                @Context.Session.GetString("Username")
+            </div>
+        </div>
+
+        <script>
+            (function () {
+                const input = document.getElementById('globalSearch');
+                const dropdown = document.getElementById('globalResults');
+                if (!input) return;
+                let timer = null;
+                input.addEventListener('input', function () {
+                    clearTimeout(timer);
+                    const q = this.value.trim();
+                    if (q.length < 2) { dropdown.style.display = 'none'; return; }
+                    timer = setTimeout(() => fetchResults(q), 300);
+                });
+                input.addEventListener('keydown', function (e) {
+                    if (e.key === 'Enter') { clearTimeout(timer); const q = this.value.trim(); if (q) window.location.href = `/Note/Search?q=${encodeURIComponent(q)}`; }
+                    if (e.key === 'Escape') dropdown.style.display = 'none';
+                });
+                document.addEventListener('click', function (e) {
+                    if (!input.contains(e.target) && !dropdown.contains(e.target)) dropdown.style.display = 'none';
+                });
+                function fetchResults(q) {
+                    fetch(`/Note/SearchJson?q=${encodeURIComponent(q)}`).then(r => r.json()).then(notes => renderDropdown(notes, q));
+                }
+                function highlight(text, q) {
+                    if (!text) return '';
+                    const regex = new RegExp(`(${q.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi');
+                    return text.replace(regex, '<span style="background:rgba(99,102,241,0.2);color:#6366f1;border-radius:3px;padding:0 2px;font-weight:600;">$1</span>');
+                }
+                function renderDropdown(notes, q) {
+                    dropdown.innerHTML = '';
+                    if (notes.length === 0) {
+                        dropdown.innerHTML = `<div style="padding:20px;text-align:center;color:var(--text-muted);font-size:0.85rem;"><i class="bi bi-search" style="display:block;font-size:1.5rem;margin-bottom:8px;opacity:0.4;"></i>Sonuç bulunamadı</div>`;
+                        dropdown.style.display = 'block'; return;
+                    }
+                    notes.slice(0, 6).forEach(note => {
+                        const preview = note.content ? note.content.substring(0, 60) + (note.content.length > 60 ? '...' : '') : '';
+                        const item = document.createElement('a');
+                        item.href = `/Note/Detail/${note.noteID}`;
+                        item.style.cssText = 'display:flex;align-items:center;gap:12px;padding:12px 16px;text-decoration:none;border-bottom:1px solid var(--card-border);transition:background 0.15s;';
+                        item.onmouseenter = () => item.style.background = 'var(--sidebar-hover)';
+                        item.onmouseleave = () => item.style.background = 'transparent';
+                        item.innerHTML = `<div style="width:34px;height:34px;border-radius:8px;background:rgba(99,102,241,0.1);display:flex;align-items:center;justify-content:center;flex-shrink:0;"><i class="bi bi-sticky" style="color:#6366f1;font-size:0.9rem;"></i></div><div style="overflow:hidden;"><div style="font-weight:600;font-size:0.88rem;color:var(--text);margin-bottom:2px;">${highlight(note.title, q)}</div><div style="font-size:0.78rem;color:var(--text-muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${highlight(preview, q)}</div></div>`;
+                        dropdown.appendChild(item);
+                    });
+                    if (notes.length > 6) {
+                        const more = document.createElement('a');
+                        more.href = `/Note/Search?q=${encodeURIComponent(q)}`;
+                        more.style.cssText = 'display:block;padding:10px 16px;text-align:center;font-size:0.82rem;color:#6366f1;font-weight:600;text-decoration:none;';
+                        more.textContent = `Tüm ${notes.length} sonucu gör →`;
+                        dropdown.appendChild(more);
+                    }
+                    dropdown.style.display = 'block';
+                }
+            })();
+        </script>
+
+        @RenderBody()
+    </div>
+}
+else
+{
+    @RenderBody()
+}
+
+<script src="~/lib/jquery/dist/jquery.min.js"></script>
+<script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    // Tema
+    function toggleTheme() {
+        const html = document.documentElement;
+        const next = html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+        html.setAttribute('data-theme', next);
+        localStorage.setItem('theme', next);
+        const lbl = document.getElementById('theme-label');
+        if (lbl) lbl.innerHTML = next === 'dark' ? '<i class="bi bi-moon-stars me-1"></i> Dark Mode' : '<i class="bi bi-sun me-1"></i> Light Mode';
+    }
+    const savedTheme = localStorage.getItem('theme') || 'dark';
+    document.documentElement.setAttribute('data-theme', savedTheme);
+    if (savedTheme === 'light') {
+        const lbl = document.getElementById('theme-label');
+        if (lbl) lbl.innerHTML = '<i class="bi bi-sun me-1"></i> Light Mode';
+    }
+
+    // Hamburger
+    function openSidebar() {
+        document.getElementById('sidebar').classList.add('open');
+        document.getElementById('sidebarOverlay').classList.add('active');
+        document.body.style.overflow = 'hidden';
+    }
+    function closeSidebar() {
+        document.getElementById('sidebar').classList.remove('open');
+        document.getElementById('sidebarOverlay').classList.remove('active');
+        document.body.style.overflow = '';
+    }
+
+    // Sidebar linklerine tıklayınca mobilde kapat
+    document.querySelectorAll('.sidebar .nav-link').forEach(link => {
+        link.addEventListener('click', () => {
+            if (window.innerWidth <= 768) closeSidebar();
+        });
+    });
+</script>
+@await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

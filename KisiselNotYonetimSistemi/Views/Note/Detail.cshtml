@@ -1,0 +1,141 @@
+﻿@model KisiselNotYonetimSistemi.Entity.Concrete.Note
+@{
+    ViewData["Title"] = Model.Title;
+}
+
+<style>
+    .detail-card {
+        border: none;
+        border-radius: 20px;
+        max-width: 720px;
+        width: 100%;
+    }
+    .detail-card .card-body { padding: 40px; }
+    .note-header {
+        margin-bottom: 24px;
+        padding-bottom: 24px;
+        border-bottom: 1px solid rgba(0,0,0,0.07);
+    }
+    .note-header h4 {
+        font-weight: 700;
+        font-size: 1.6rem;
+        margin-bottom: 12px;
+        word-break: break-word;
+    }
+    .note-meta {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        flex-wrap: wrap;
+    }
+    .meta-item {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 0.85rem;
+        opacity: 0.65;
+    }
+    .cat-tag {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        background: rgba(99,102,241,0.1);
+        color: #6366f1;
+        border-radius: 20px;
+        padding: 4px 14px;
+        font-size: 0.82rem;
+        font-weight: 600;
+    }
+    .note-content {
+        line-height: 1.9;
+        font-size: 0.97rem;
+        white-space: pre-wrap;
+        margin-bottom: 32px;
+        opacity: 0.85;
+        word-break: break-word;
+    }
+    .action-bar {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        padding-top: 24px;
+        border-top: 1px solid rgba(0,0,0,0.07);
+    }
+    .btn-action {
+        border-radius: 10px;
+        padding: 10px 20px;
+        font-size: 0.88rem;
+        font-weight: 600;
+        border: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        text-decoration: none;
+        transition: opacity 0.2s, transform 0.1s;
+        white-space: nowrap;
+    }
+    .btn-action:hover {
+        opacity: 0.88;
+        transform: translateY(-1px);
+    }
+    .btn-edit {
+        background: linear-gradient(135deg, #f59e0b, #f97316);
+        color: white;
+    }
+    .btn-delete {
+        background: rgba(239,68,68,0.1);
+        color: #ef4444;
+    }
+    .btn-back {
+        background: rgba(0,0,0,0.06);
+        color: inherit;
+    }
+    .accent-bar {
+        height: 5px;
+        background: linear-gradient(135deg, #6366f1, #8b5cf6);
+        border-radius: 20px 20px 0 0;
+    }
+
+    @@media (max-width: 768px) {
+        .detail-card .card-body { padding: 20px; }
+        .note-header h4 { font-size: 1.3rem; }
+        .btn-action { flex: 1; justify-content: center; }
+    }
+</style>
+
+<div class="card detail-card shadow-sm">
+    <div class="accent-bar"></div>
+    <div class="card-body">
+        <div class="note-header">
+            <h4>@Model.Title</h4>
+            <div class="note-meta">
+                <span class="meta-item">
+                    <i class="bi bi-calendar3"></i>
+                    @Model.CreatedDate.ToString("dd MMMM yyyy")
+                </span>
+                @if (Model.Category != null)
+                {
+                    <span class="cat-tag">
+                        <i class="bi bi-tag-fill"></i>
+                        @Model.Category.CategoryName
+                    </span>
+                }
+            </div>
+        </div>
+
+        <div class="note-content">@Model.Content</div>
+
+        <div class="action-bar">
+            <a asp-action="Edit" asp-route-id="@Model.NoteID" class="btn-action btn-edit">
+                <i class="bi bi-pencil"></i> Düzenle
+            </a>
+            <a href="/Note/SoftDelete/@Model.NoteID" class="btn-action btn-delete"
+               onclick="event.preventDefault(); showConfirm('Not çöp kutusuna taşınacak.', this.href, 'danger')">
+                <i class="bi bi-trash"></i> Sil
+            </a>
+            <a asp-action="Index" class="btn-action btn-back">
+                <i class="bi bi-arrow-left"></i> Geri
+            </a>
+        </div>
+    </div>
+</div>

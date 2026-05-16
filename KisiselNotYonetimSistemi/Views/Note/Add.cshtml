@@ -1,0 +1,138 @@
+﻿@model KisiselNotYonetimSistemi.Entity.Concrete.Note
+@{
+    ViewData["Title"] = "Yeni Not";
+}
+
+<style>
+    .form-card {
+        border: none;
+        border-radius: 20px;
+        max-width: 680px;
+        width: 100%;
+    }
+    .form-card .card-body {
+        padding: 36px;
+    }
+    .page-title {
+        font-weight: 700;
+        font-size: 1.2rem;
+        margin-bottom: 24px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+    .page-title .title-icon {
+        width: 40px;
+        height: 40px;
+        background: linear-gradient(135deg, #6366f1, #8b5cf6);
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 1rem;
+        flex-shrink: 0;
+    }
+    .form-label {
+        font-weight: 600;
+        font-size: 0.85rem;
+        margin-bottom: 6px;
+    }
+    .form-control, .form-select {
+        border-radius: 10px;
+        border: 1.5px solid #e5e7eb;
+        padding: 11px 14px;
+        font-size: 0.92rem;
+        transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    .form-control:focus, .form-select:focus {
+        border-color: #6366f1;
+        box-shadow: 0 0 0 3px rgba(99,102,241,0.15);
+    }
+    textarea.form-control {
+        resize: vertical;
+        min-height: 160px;
+    }
+    .btn-save {
+        background: linear-gradient(135deg, #6366f1, #8b5cf6);
+        border: none;
+        border-radius: 10px;
+        padding: 11px 28px;
+        font-weight: 600;
+        font-size: 0.92rem;
+        color: white;
+        transition: opacity 0.2s, transform 0.1s;
+    }
+    .btn-save:hover {
+        opacity: 0.9;
+        color: white;
+        transform: translateY(-1px);
+    }
+    .btn-cancel {
+        border-radius: 10px;
+        padding: 11px 24px;
+        font-weight: 600;
+        font-size: 0.92rem;
+        border: 1.5px solid #e5e7eb;
+        background: transparent;
+        transition: background 0.15s;
+        text-decoration: none;
+        color: inherit;
+        display: inline-flex;
+        align-items: center;
+    }
+    .btn-cancel:hover { background: #f9fafb; }
+
+    @@media (max-width: 768px) {
+        .form-card .card-body { padding: 20px; }
+        .btn-save, .btn-cancel { width: 100%; justify-content: center; }
+        .d-flex.gap-3 { flex-direction: column; }
+    }
+</style>
+
+<div class="card form-card shadow-sm">
+    <div class="card-body">
+        <div class="page-title">
+            <div class="title-icon"><i class="bi bi-plus-lg"></i></div>
+            Yeni Not Ekle
+        </div>
+
+        @if (ViewBag.Error != null)
+        {
+            <div class="alert alert-danger border-0 rounded-3 mb-4" style="background:#fef2f2;color:#dc2626;font-size:0.88rem;">
+                <i class="bi bi-exclamation-circle me-2"></i>@ViewBag.Error
+            </div>
+        }
+
+        <form method="post">
+            <div class="mb-3">
+                <label class="form-label">Başlık</label>
+                <input type="text" name="Title" class="form-control" value="@Model?.Title"
+                       placeholder="Not başlığı girin" required />
+            </div>
+            <div class="mb-3">
+                <label class="form-label">İçerik</label>
+                <textarea name="Content" class="form-control"
+                          placeholder="Not içeriğini buraya yazın...">@Model?.Content</textarea>
+            </div>
+            <div class="mb-4">
+                <label class="form-label">Kategori</label>
+                <select name="CategoryID" class="form-select">
+                    <option value="">-- Kategori Seç --</option>
+                    @foreach (var cat in ViewBag.Categories)
+                    {
+                        <option value="@cat.CategoryID">@cat.CategoryName</option>
+                    }
+                </select>
+            </div>
+            <div class="d-flex gap-3">
+                <button type="submit" class="btn-save">
+                    <i class="bi bi-check-lg me-1"></i> Kaydet
+                </button>
+                <a asp-action="Index" class="btn-cancel">
+                    İptal
+                </a>
+            </div>
+        </form>
+    </div>
+</div>

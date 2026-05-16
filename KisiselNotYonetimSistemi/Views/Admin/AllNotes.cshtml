@@ -1,0 +1,97 @@
+﻿@model List<KisiselNotYonetimSistemi.Entity.Concrete.Note>
+@{
+    ViewData["Title"] = "Tüm Notlar";
+}
+
+<style>
+    .notes-table th {
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 0.8px;
+        color: var(--text-muted);
+        font-weight: 600;
+        border-bottom: 1px solid var(--card-border) !important;
+        padding: 12px 16px;
+    }
+    .notes-table td {
+        padding: 14px 16px;
+        font-size: 0.88rem;
+        vertical-align: middle;
+        border-bottom: 1px solid var(--card-border) !important;
+    }
+    .notes-table tr:last-child td { border-bottom: none !important; }
+    .btn-del { background:rgba(239,68,68,0.1); color:#ef4444; border:none; border-radius:8px; padding:5px 14px; font-size:0.82rem; font-weight:500; text-decoration:none; }
+    .btn-del:hover { opacity:0.8; color:#ef4444; }
+    .page-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:24px; }
+    .page-header h5 { font-weight:700; font-size:1.1rem; margin:0; }
+    .note-count { background:rgba(108,99,255,0.1); color:#6c63ff; border-radius:20px; padding:2px 12px; font-size:0.82rem; font-weight:600; margin-left:10px; }
+    .status-badge { border-radius:20px; padding:3px 12px; font-size:0.75rem; font-weight:600; }
+    .status-active   { background:rgba(16,185,129,0.15); color:#10b981; }
+    .status-archived { background:rgba(245,158,11,0.15); color:#f59e0b; }
+    .status-deleted  { background:rgba(239,68,68,0.15);  color:#ef4444; }
+</style>
+
+<div class="page-header">
+    <h5>
+        <i class="bi bi-journal-text me-2"></i>Tüm Notlar
+        <span class="note-count">@Model.Count</span>
+    </h5>
+    <a asp-action="Index" class="btn btn-outline-secondary btn-sm rounded-pill">
+        <i class="bi bi-arrow-left me-1"></i> Admin Panel
+    </a>
+</div>
+
+<div class="card">
+    <div class="card-body p-0">
+        <table class="table notes-table mb-0">
+            <thead>
+                <tr>
+                    <th>Başlık</th>
+                    <th>Kullanıcı ID</th>
+                    <th>Kategori</th>
+                    <th>Tarih</th>
+                    <th>Durum</th>
+                    <th>İşlem</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var note in Model)
+                {
+                    <tr>
+                        <td style="font-weight:600">@note.Title</td>
+                        <td style="color:var(--text-muted)">
+                            <i class="bi bi-person me-1"></i>
+                            @(ViewBag.Users.ContainsKey(note.UserID) ? ViewBag.Users[note.UserID] : "—")
+                        </td>
+                        <td style="color:var(--text-muted)">
+                            @(note.Category?.CategoryName ?? "—")
+                        </td>
+                        <td style="color:var(--text-muted)">
+                            @note.CreatedDate.ToString("dd MMM yyyy")
+                        </td>
+                        <td>
+                            @if (note.IsDeleted)
+                            {
+                                <span class="status-badge status-deleted">Silindi</span>
+                            }
+                            else if (note.IsArchived)
+                            {
+                                <span class="status-badge status-archived">Arşivde</span>
+                            }
+                            else
+                            {
+                                <span class="status-badge status-active">Aktif</span>
+                            }
+                        </td>
+                        <td>
+                            <a href="/Admin/DeleteNote/@note.NoteID" class="btn-del"
+                                onclick="event.preventDefault(); showConfirm('Not kalıcı olarak silinecek, geri alınamaz!', this.href, 'danger')">
+                                <i class="bi bi-trash me-1"></i>Sil
+                            </a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

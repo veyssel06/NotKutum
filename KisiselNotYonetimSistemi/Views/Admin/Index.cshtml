@@ -1,0 +1,109 @@
+﻿@{
+    ViewData["Title"] = "Admin Panel";
+}
+
+<style>
+    .admin-stat-card {
+        background: var(--card-bg);
+        border: 1px solid var(--card-border);
+        border-radius: 16px;
+        padding: 24px;
+        display: flex;
+        align-items: center;
+        gap: 16px;
+    }
+    .admin-stat-icon {
+        width: 52px;
+        height: 52px;
+        border-radius: 14px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.4rem;
+        flex-shrink: 0;
+    }
+    .stat-label { color: var(--text-muted); font-size: 0.8rem; margin-bottom: 2px; }
+    .stat-value { color: var(--text); font-size: 1.8rem; font-weight: 700; line-height: 1; }
+    .section-title {
+        font-weight: 700;
+        font-size: 1rem;
+        margin-bottom: 16px;
+        color: var(--text);
+    }
+</style>
+
+<div class="row g-4 mb-4">
+    <div class="col-md-3">
+        <div class="admin-stat-card">
+            <div class="admin-stat-icon" style="background:rgba(108,99,255,0.15)">
+                <i class="bi bi-people-fill" style="color:#6c63ff"></i>
+            </div>
+            <div>
+                <div class="stat-label">TOPLAM KULLANICI</div>
+                <div class="stat-value">@ViewBag.TotalUsers</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="admin-stat-card">
+            <div class="admin-stat-icon" style="background:rgba(16,185,129,0.15)">
+                <i class="bi bi-sticky-fill" style="color:#10b981"></i>
+            </div>
+            <div>
+                <div class="stat-label">TOPLAM NOT</div>
+                <div class="stat-value">@ViewBag.TotalNotes</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="admin-stat-card">
+            <div class="admin-stat-icon" style="background:rgba(245,158,11,0.15)">
+                <i class="bi bi-tags-fill" style="color:#f59e0b"></i>
+            </div>
+            <div>
+                <div class="stat-label">TOPLAM KATEGORİ</div>
+                <div class="stat-value">@ViewBag.TotalCategories</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="admin-stat-card">
+            <div class="admin-stat-icon" style="background:rgba(239,68,68,0.15)">
+                <i class="bi bi-slash-circle-fill" style="color:#ef4444"></i>
+            </div>
+            <div>
+                <div class="stat-label">BANLANAN KULLANICI</div>
+                <div class="stat-value">@ViewBag.BannedUsers</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4">
+    <div class="col-md-6">
+        <div class="card h-100">
+            <div class="card-body p-4">
+                <div class="section-title"><i class="bi bi-people me-2"></i>Kullanıcı Yönetimi</div>
+                <p style="color:var(--text-muted);font-size:0.88rem;">
+                    Tüm kullanıcıları görüntüle, banla veya ban kaldır.
+                </p>
+                <a asp-action="Users" class="btn btn-primary btn-sm">
+                    <i class="bi bi-arrow-right me-1"></i> Kullanıcılara Git
+                </a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card h-100">
+            <div class="card-body p-4">
+                <div class="section-title"><i class="bi bi-journal-text me-2"></i>Not Yönetimi</div>
+                <p style="color:var(--text-muted);font-size:0.88rem;">
+                    Sistemdeki tüm notları görüntüle ve yönet.
+                </p>
+                <a asp-action="AllNotes" class="btn btn-primary btn-sm">
+                    <i class="bi bi-arrow-right me-1"></i> Notlara Git
+                </a>
+            </div>
+        </div>
+    </div>
+</div>

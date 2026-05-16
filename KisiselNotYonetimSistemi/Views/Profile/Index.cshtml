@@ -1,0 +1,327 @@
+﻿@model KisiselNotYonetimSistemi.Entity.Concrete.User
+@{
+    ViewData["Title"] = "Profilim";
+}
+
+<style>
+    .profile-page { max-width: 860px; width: 100%; }
+
+    .profile-banner {
+        background: var(--card-bg);
+        border: 1px solid var(--card-border);
+        border-radius: 16px;
+        padding: 28px 32px;
+        display: flex;
+        align-items: center;
+        gap: 24px;
+        margin-bottom: 20px;
+        flex-wrap: wrap;
+    }
+    .avatar {
+        width: 72px; height: 72px; flex-shrink: 0;
+        background: linear-gradient(135deg, #6366f1, #8b5cf6);
+        border-radius: 18px;
+        display: flex; align-items: center; justify-content: center;
+        font-size: 2rem; color: white;
+    }
+    .banner-info { flex: 1; min-width: 160px; }
+    .banner-name { font-size: 1.2rem; font-weight: 700; color: var(--text); margin-bottom: 3px; }
+    .banner-email { font-size: 0.8rem; color: var(--text-muted); margin-bottom: 12px; }
+    .banner-stats { display: flex; gap: 24px; flex-wrap: wrap; }
+    .banner-stat-value { font-size: 1.1rem; font-weight: 700; }
+    .banner-stat-label { font-size: 0.7rem; color: var(--text-muted); }
+
+    .banner-meta {
+        display: flex; flex-direction: column; gap: 8px; align-items: flex-end;
+    }
+    .meta-badge {
+        background: var(--sidebar-hover);
+        border: 1px solid var(--card-border);
+        border-radius: 8px; padding: 5px 14px;
+        font-size: 0.75rem; font-weight: 600; color: var(--text-muted);
+    }
+    .btn-logout-sm {
+        background: #ef4444; border: none; border-radius: 9px;
+        padding: 8px 16px; font-size: 0.8rem; font-weight: 600; color: white;
+        display: inline-flex; align-items: center; gap: 6px;
+        text-decoration: none; cursor: pointer; transition: opacity 0.2s;
+    }
+    .btn-logout-sm:hover { opacity: 0.88; color: white; }
+    .btn-delete-sm {
+        background: transparent; border: 1.5px solid #ef4444;
+        border-radius: 9px; padding: 7px 16px;
+        font-size: 0.8rem; font-weight: 600; color: #ef4444;
+        display: inline-flex; align-items: center; gap: 6px;
+        text-decoration: none; cursor: pointer; transition: background 0.2s, color 0.2s;
+    }
+    .btn-delete-sm:hover { background: #ef4444; color: white; }
+
+    .form-card {
+        background: var(--card-bg);
+        border: 1px solid var(--card-border);
+        border-radius: 16px;
+        padding: 26px 28px;
+        margin-bottom: 16px;
+    }
+    .form-card-header {
+        display: flex; align-items: center; gap: 12px;
+        margin-bottom: 22px; padding-bottom: 16px;
+        border-bottom: 1px solid var(--card-border);
+    }
+    .header-icon {
+        width: 36px; height: 36px; border-radius: 10px;
+        display: flex; align-items: center; justify-content: center;
+        font-size: 1rem; color: white; flex-shrink: 0;
+    }
+    .header-text-title { font-size: 0.95rem; font-weight: 700; color: var(--text); }
+    .header-text-sub { font-size: 0.75rem; color: var(--text-muted); margin-top: 1px; }
+
+    .form-label {
+        font-size: 0.72rem; font-weight: 600; color: var(--text-muted);
+        text-transform: uppercase; letter-spacing: 0.05em;
+        display: block; margin-bottom: 7px;
+    }
+    .form-control {
+        background: var(--input-bg) !important;
+        border: 1.5px solid var(--input-border) !important;
+        color: var(--input-text) !important;
+        border-radius: 10px; padding: 11px 14px; font-size: 0.9rem;
+        width: 100%; transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    .form-control:focus {
+        border-color: #6366f1 !important;
+        box-shadow: 0 0 0 3px rgba(99,102,241,0.12) !important;
+        outline: none;
+    }
+
+    .username-row { display: flex; gap: 12px; align-items: flex-end; flex-wrap: wrap; }
+    .username-row .fg { flex: 1; min-width: 180px; margin-bottom: 0; }
+
+    .pw-fields { display: flex; flex-direction: column; gap: 16px; margin-bottom: 20px; }
+
+    .password-wrapper { position: relative; }
+    .password-wrapper .form-control { padding-right: 44px; }
+    .eye-btn {
+        position: absolute; right: 13px; top: 50%; transform: translateY(-50%);
+        background: none; border: none; color: var(--text-muted);
+        cursor: pointer; font-size: 0.95rem; padding: 0; line-height: 1;
+    }
+    .eye-btn:hover { color: var(--text); }
+
+    .strength-bars { display: flex; gap: 4px; margin-top: 7px; }
+    .strength-bar { flex: 1; height: 3px; border-radius: 2px; background: var(--card-border); transition: background 0.3s; }
+    .hint-label { font-size: 0.7rem; margin-top: 5px; font-weight: 600; min-height: 16px; }
+
+    .btn-primary {
+        background: #6366f1; border: none; border-radius: 10px;
+        padding: 10px 22px; font-size: 0.85rem; font-weight: 600; color: white;
+        cursor: pointer; transition: background 0.2s;
+        display: inline-flex; align-items: center; gap: 7px; white-space: nowrap;
+    }
+    .btn-primary:hover { background: #4f46e5; }
+    .btn-warning {
+        background: #f59e0b; border: none; border-radius: 10px;
+        padding: 11px 28px; font-size: 0.87rem; font-weight: 600; color: white;
+        cursor: pointer; transition: background 0.2s;
+        display: inline-flex; align-items: center; gap: 8px;
+        width: 100%;
+    }
+    .btn-warning:hover { background: #d97706; }
+
+    @@media (max-width: 768px) {
+        .profile-banner { padding: 20px; gap: 16px; }
+        .banner-meta { align-items: flex-start; flex-direction: row; flex-wrap: wrap; }
+        .form-card { padding: 18px; }
+        .username-row { flex-direction: column; }
+        .username-row .fg { width: 100%; }
+        .btn-primary { width: 100%; justify-content: center; }
+    }
+</style>
+
+@if (TempData["Success"] != null)
+{
+    <div class="alert border-0 rounded-3 mb-3" style="background:rgba(16,185,129,0.1);color:#10b981;font-size:0.85rem;">
+        <i class="bi bi-check-circle me-2"></i>@TempData["Success"]
+    </div>
+}
+@if (TempData["Error"] != null)
+{
+    <div class="alert border-0 rounded-3 mb-3" style="background:rgba(239,68,68,0.1);color:#ef4444;font-size:0.85rem;">
+        <i class="bi bi-exclamation-circle me-2"></i>@TempData["Error"]
+    </div>
+}
+
+<div class="profile-page">
+
+    <!-- BANNER -->
+    <div class="profile-banner">
+        <div class="avatar"><i class="bi bi-person-fill"></i></div>
+        <div class="banner-info">
+            <div class="banner-name">@Model.Username</div>
+            <div class="banner-email">@Model.Email</div>
+            <div class="banner-stats">
+                <div class="banner-stat">
+                    <div class="banner-stat-value" style="color:#6366f1">@ViewBag.TotalNotes</div>
+                    <div class="banner-stat-label">Not</div>
+                </div>
+                <div class="banner-stat">
+                    <div class="banner-stat-value" style="color:#10b981">@ViewBag.ArchivedNotes</div>
+                    <div class="banner-stat-label">Arşiv</div>
+                </div>
+                <div class="banner-stat">
+                    <div class="banner-stat-value" style="color:#ef4444">@ViewBag.DeletedNotes</div>
+                    <div class="banner-stat-label">Çöp</div>
+                </div>
+            </div>
+        </div>
+        <div class="banner-meta">
+            <span class="meta-badge"><i class="bi bi-shield-check me-1"></i>@Model.Role</span>
+            <a asp-controller="Account" asp-action="Logout" class="btn-logout-sm">
+                <i class="bi bi-box-arrow-left"></i> Çıkış Yap
+            </a>
+            <a href="/Account/DeleteAccount" class="btn-delete-sm"
+               onclick="event.preventDefault(); showConfirm('Hesabınız kalıcı olarak silinecek!', this.href, 'danger')">
+                <i class="bi bi-person-x"></i> Hesabı Sil
+            </a>
+        </div>
+    </div>
+
+    <!-- KULLANICI ADI -->
+    <div class="form-card">
+        <div class="form-card-header">
+            <div class="header-icon" style="background:#6366f1">
+                <i class="bi bi-person"></i>
+            </div>
+            <div>
+                <div class="header-text-title">Kullanıcı Adını Güncelle</div>
+                <div class="header-text-sub">Görünen adınızı değiştirin</div>
+            </div>
+        </div>
+        <form method="post" asp-action="UpdateUsername">
+            <div class="username-row">
+                <div class="fg">
+                    <label class="form-label">Yeni Kullanıcı Adı</label>
+                    <input type="text" name="newUsername" class="form-control"
+                           placeholder="Kullanıcı adı girin" value="@Model.Username" required />
+                </div>
+                <button type="submit" class="btn-primary">
+                    <i class="bi bi-check-lg"></i> Güncelle
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <!-- ŞİFRE -->
+    <div class="form-card">
+        <div class="form-card-header">
+            <div class="header-icon" style="background:#f59e0b">
+                <i class="bi bi-lock"></i>
+            </div>
+            <div>
+                <div class="header-text-title">Şifre Değiştir</div>
+                <div class="header-text-sub">Hesap güvenliğinizi güncelleyin</div>
+            </div>
+        </div>
+        <form method="post" asp-action="UpdatePassword">
+            <div class="pw-fields">
+                <div>
+                    <label class="form-label">Mevcut Şifre</label>
+                    <div class="password-wrapper">
+                        <input type="password" name="currentPassword" id="currentPassword"
+                               class="form-control" placeholder="••••••••" required />
+                        <button type="button" class="eye-btn" onclick="toggleEye('currentPassword','eye1')">
+                            <i class="bi bi-eye" id="eye1"></i>
+                        </button>
+                    </div>
+                </div>
+                <div>
+                    <label class="form-label">Yeni Şifre</label>
+                    <div class="password-wrapper">
+                        <input type="password" name="newPassword" id="newPassword"
+                               class="form-control" placeholder="••••••••" required />
+                        <button type="button" class="eye-btn" onclick="toggleEye('newPassword','eye2')">
+                            <i class="bi bi-eye" id="eye2"></i>
+                        </button>
+                    </div>
+                    <div class="strength-bars">
+                        <div class="strength-bar" id="bar1"></div>
+                        <div class="strength-bar" id="bar2"></div>
+                        <div class="strength-bar" id="bar3"></div>
+                        <div class="strength-bar" id="bar4"></div>
+                    </div>
+                    <div class="hint-label" id="strengthLabel"></div>
+                </div>
+                <div>
+                    <label class="form-label">Yeni Şifre Tekrar</label>
+                    <div class="password-wrapper">
+                        <input type="password" name="confirmPassword" id="confirmPassword"
+                               class="form-control" placeholder="••••••••" required />
+                        <button type="button" class="eye-btn" onclick="toggleEye('confirmPassword','eye3')">
+                            <i class="bi bi-eye" id="eye3"></i>
+                        </button>
+                    </div>
+                    <div class="hint-label" id="matchLabel"></div>
+                </div>
+            </div>
+            <button type="submit" class="btn-warning">
+                <i class="bi bi-shield-check"></i> Şifreyi Güncelle
+            </button>
+        </form>
+    </div>
+
+</div>
+
+<script>
+    function toggleEye(inputId, iconId) {
+        const input = document.getElementById(inputId);
+        const icon = document.getElementById(iconId);
+        input.type = input.type === 'password' ? 'text' : 'password';
+        icon.className = input.type === 'password' ? 'bi bi-eye' : 'bi bi-eye-slash';
+    }
+
+    const levels = [
+        { label: '', color: '' },
+        { label: 'Zayıf', color: '#ef4444' },
+        { label: 'Orta', color: '#f59e0b' },
+        { label: 'İyi', color: '#3b82f6' },
+        { label: 'Güçlü ✓', color: '#10b981' },
+    ];
+
+    function getStrength(pw) {
+        if (!pw) return 0;
+        let score = 0;
+        if (pw.length >= 6) score++;
+        if (pw.length >= 10) score++;
+        if (/[A-Z]/.test(pw) && /[a-z]/.test(pw)) score++;
+        if (/[0-9]/.test(pw) && /[^A-Za-z0-9]/.test(pw)) score++;
+        return Math.min(score, 4);
+    }
+
+    document.getElementById('newPassword').addEventListener('input', function () {
+        const score = getStrength(this.value);
+        const level = levels[score];
+        ['bar1','bar2','bar3','bar4'].forEach((id, i) => {
+            document.getElementById(id).style.background = i < score ? level.color : '';
+        });
+        const lbl = document.getElementById('strengthLabel');
+        lbl.textContent = level.label;
+        lbl.style.color = level.color;
+        checkMatch();
+    });
+
+    document.getElementById('confirmPassword').addEventListener('input', checkMatch);
+
+    function checkMatch() {
+        const pw1 = document.getElementById('newPassword').value;
+        const pw2 = document.getElementById('confirmPassword').value;
+        const lbl = document.getElementById('matchLabel');
+        if (!pw2) { lbl.textContent = ''; return; }
+        if (pw1 === pw2) {
+            lbl.textContent = 'Şifreler eşleşiyor ✓';
+            lbl.style.color = '#10b981';
+        } else {
+            lbl.textContent = 'Şifreler eşleşmiyor';
+            lbl.style.color = '#ef4444';
+        }
+    }
+</script>

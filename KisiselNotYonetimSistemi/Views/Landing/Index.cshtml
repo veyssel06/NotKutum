@@ -1,0 +1,737 @@
+﻿@{
+    Layout = null;
+}
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>NotKutum — Notlarını Yönet</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" />
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        :root {
+            --bg: #0a0910;
+            --surface: #111020;
+            --border: #ffffff0d;
+            --border-strong: #ffffff18;
+            --text: #f0eeff;
+            --muted: #7b7a99;
+            --accent: #7c6fff;
+            --accent-dim: #7c6fff22;
+            --accent-hover: #6a5aee;
+            --green: #10b981;
+            --green-dim: #10b98118;
+        }
+
+        html { scroll-behavior: smooth; }
+
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: 'Inter', sans-serif;
+            overflow-x: hidden;
+        }
+
+        /* ── STARS ── */
+        .stars {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 0;
+        }
+        .star {
+            position: absolute;
+            border-radius: 50%;
+            background: #fff;
+            animation: twinkle var(--d) ease-in-out infinite alternate;
+            opacity: 0;
+        }
+        @@keyframes twinkle {
+            to { opacity: var(--o); }
+        }
+
+        /* ── NAV ── */
+        nav {
+            position: fixed;
+            top: 0; left: 0; right: 0;
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 20px 40px;
+            background: rgba(10,9,16,0.7);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .nav-logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+        }
+        .nav-logo-dot {
+            width: 10px; height: 10px;
+            border-radius: 50%;
+            background: var(--accent);
+            box-shadow: 0 0 10px var(--accent);
+        }
+        .nav-logo span {
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--text);
+            letter-spacing: 0.05em;
+        }
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 32px;
+        }
+        .nav-links a {
+            color: var(--muted);
+            text-decoration: none;
+            font-size: 0.88rem;
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+        .nav-links a:hover { color: var(--text); }
+
+        .nav-cta {
+            display: flex;
+            gap: 12px;
+        }
+
+        .btn-ghost {
+            padding: 9px 20px;
+            border: 1px solid var(--border-strong);
+            border-radius: 10px;
+            background: transparent;
+            color: var(--text);
+            font-size: 0.88rem;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            transition: border-color 0.2s, background 0.2s;
+            font-family: 'Inter', sans-serif;
+        }
+        .btn-ghost:hover { border-color: var(--accent); background: var(--accent-dim); color: var(--text); }
+
+        .btn-primary {
+            padding: 9px 20px;
+            border: none;
+            border-radius: 10px;
+            background: var(--accent);
+            color: white;
+            font-size: 0.88rem;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            transition: background 0.2s, transform 0.1s;
+            font-family: 'Inter', sans-serif;
+        }
+        .btn-primary:hover { background: var(--accent-hover); transform: translateY(-1px); color: white; }
+
+        /* hamburger */
+        .hamburger {
+            display: none;
+            flex-direction: column;
+            gap: 5px;
+            cursor: pointer;
+            padding: 4px;
+            background: none;
+            border: none;
+        }
+        .hamburger span {
+            display: block;
+            width: 24px;
+            height: 2px;
+            background: var(--text);
+            border-radius: 2px;
+            transition: 0.3s;
+        }
+
+        .mobile-menu {
+            display: none;
+            position: fixed;
+            top: 65px; left: 0; right: 0;
+            background: rgba(10,9,16,0.97);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border);
+            padding: 24px 24px 32px;
+            z-index: 99;
+            flex-direction: column;
+            gap: 20px;
+        }
+        .mobile-menu.open { display: flex; }
+        .mobile-menu a {
+            color: var(--muted);
+            text-decoration: none;
+            font-size: 1rem;
+            font-weight: 500;
+            padding: 8px 0;
+            border-bottom: 1px solid var(--border);
+            transition: color 0.2s;
+        }
+        .mobile-menu a:hover { color: var(--text); }
+        .mobile-menu .mobile-btns {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-top: 8px;
+        }
+        .mobile-menu .btn-ghost,
+        .mobile-menu .btn-primary {
+            width: 100%;
+            text-align: center;
+            padding: 13px;
+            font-size: 0.95rem;
+        }
+
+        /* ── HERO ── */
+        .hero {
+            position: relative;
+            z-index: 1;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 120px 24px 80px;
+        }
+
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 16px;
+            border: 1px solid var(--border-strong);
+            border-radius: 100px;
+            font-size: 0.78rem;
+            font-weight: 600;
+            color: var(--muted);
+            letter-spacing: 0.06em;
+            margin-bottom: 36px;
+            background: var(--surface);
+        }
+        .hero-badge-dot {
+            width: 6px; height: 6px;
+            border-radius: 50%;
+            background: var(--green);
+            box-shadow: 0 0 8px var(--green);
+            animation: pulse 2s ease-in-out infinite;
+        }
+        @@keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.3; }
+        }
+
+        .hero h1 {
+            font-size: clamp(2.8rem, 7vw, 5.5rem);
+            font-weight: 900;
+            line-height: 1.05;
+            letter-spacing: -0.03em;
+            margin-bottom: 24px;
+            max-width: 800px;
+        }
+
+        .hero h1 .accent {
+            color: var(--accent);
+            position: relative;
+        }
+
+        .hero p {
+            font-size: clamp(1rem, 2.5vw, 1.2rem);
+            color: var(--muted);
+            max-width: 520px;
+            line-height: 1.7;
+            margin-bottom: 44px;
+        }
+
+        .hero-btns {
+            display: flex;
+            gap: 14px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .hero-btns .btn-primary {
+            padding: 14px 32px;
+            font-size: 1rem;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .hero-btns .btn-ghost {
+            padding: 14px 32px;
+            font-size: 1rem;
+            border-radius: 12px;
+        }
+
+        .hero-scroll {
+            position: absolute;
+            bottom: 36px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            color: var(--muted);
+            font-size: 0.72rem;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            animation: bounce 2s ease-in-out infinite;
+        }
+        @@keyframes bounce {
+            0%, 100% { transform: translateX(-50%) translateY(0); }
+            50% { transform: translateX(-50%) translateY(6px); }
+        }
+
+        /* ── FEATURES ── */
+        section { position: relative; z-index: 1; }
+
+        .features {
+            padding: 100px 24px;
+        }
+
+        .section-label {
+            text-align: center;
+            font-size: 0.75rem;
+            font-weight: 700;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            color: var(--accent);
+            margin-bottom: 16px;
+        }
+
+        .section-title {
+            text-align: center;
+            font-size: clamp(1.8rem, 4vw, 2.8rem);
+            font-weight: 800;
+            letter-spacing: -0.02em;
+            margin-bottom: 16px;
+        }
+
+        .section-sub {
+            text-align: center;
+            color: var(--muted);
+            font-size: 1rem;
+            max-width: 480px;
+            margin: 0 auto 64px;
+            line-height: 1.7;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .feature-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 32px 28px;
+            transition: border-color 0.3s, transform 0.3s;
+        }
+        .feature-card:hover {
+            border-color: var(--accent);
+            transform: translateY(-4px);
+        }
+
+        .feature-icon {
+            width: 48px; height: 48px;
+            border-radius: 12px;
+            background: var(--accent-dim);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.4rem;
+            margin-bottom: 20px;
+            color: var(--accent);
+        }
+
+        .feature-card h3 {
+            font-size: 1rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        .feature-card p {
+            font-size: 0.88rem;
+            color: var(--muted);
+            line-height: 1.65;
+        }
+
+        /* ── HOW ── */
+        .how {
+            padding: 100px 24px;
+            background: linear-gradient(180deg, transparent, var(--surface) 30%, var(--surface) 70%, transparent);
+        }
+
+        .steps {
+            display: flex;
+            flex-direction: column;
+            gap: 0;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .step {
+            display: flex;
+            gap: 24px;
+            padding: 32px 0;
+            position: relative;
+        }
+
+        .step:not(:last-child)::after {
+            content: '';
+            position: absolute;
+            left: 19px;
+            top: 72px;
+            bottom: 0;
+            width: 2px;
+            background: linear-gradient(var(--border-strong), transparent);
+        }
+
+        .step-num {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            border: 2px solid var(--accent);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: var(--accent);
+            flex-shrink: 0;
+            background: var(--bg);
+        }
+
+        .step-content h3 {
+            font-size: 1.05rem;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .step-content p {
+            font-size: 0.88rem;
+            color: var(--muted);
+            line-height: 1.65;
+        }
+
+        /* ── CTA ── */
+        .cta-section {
+            padding: 100px 24px;
+            text-align: center;
+        }
+
+        .cta-box {
+            max-width: 600px;
+            margin: 0 auto;
+            background: var(--surface);
+            border: 1px solid var(--border-strong);
+            border-radius: 24px;
+            padding: 64px 48px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .cta-box::before {
+            content: '';
+            position: absolute;
+            top: -60px; left: 50%;
+            transform: translateX(-50%);
+            width: 300px; height: 300px;
+            background: radial-gradient(circle, var(--accent-dim) 0%, transparent 70%);
+            pointer-events: none;
+        }
+
+        .cta-box h2 {
+            font-size: clamp(1.6rem, 4vw, 2.2rem);
+            font-weight: 800;
+            letter-spacing: -0.02em;
+            margin-bottom: 16px;
+        }
+
+        .cta-box p {
+            color: var(--muted);
+            font-size: 0.95rem;
+            line-height: 1.7;
+            margin-bottom: 36px;
+        }
+
+        .cta-box .btn-primary {
+            padding: 15px 40px;
+            font-size: 1rem;
+            border-radius: 12px;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* ── FOOTER ── */
+        footer {
+            position: relative;
+            z-index: 1;
+            border-top: 1px solid var(--border);
+            padding: 40px 40px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+
+        .footer-logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+        }
+        .footer-logo span {
+            font-size: 0.9rem;
+            font-weight: 700;
+            color: var(--muted);
+        }
+
+        .footer-links {
+            display: flex;
+            gap: 28px;
+        }
+        .footer-links a {
+            color: var(--muted);
+            text-decoration: none;
+            font-size: 0.82rem;
+            transition: color 0.2s;
+        }
+        .footer-links a:hover { color: var(--text); }
+
+        .footer-copy {
+            font-size: 0.78rem;
+            color: var(--muted);
+        }
+
+        /* ── RESPONSIVE ── */
+        @@media (max-width: 768px) {
+            nav { padding: 18px 20px; }
+            .nav-links, .nav-cta { display: none; }
+            .hamburger { display: flex; }
+
+            .features-grid {
+                grid-template-columns: 1fr;
+                max-width: 480px;
+            }
+
+            .cta-box { padding: 48px 28px; }
+
+            footer {
+                flex-direction: column;
+                align-items: flex-start;
+                padding: 32px 20px;
+                gap: 20px;
+            }
+
+            .footer-links { flex-wrap: wrap; gap: 16px; }
+        }
+
+        @@media (min-width: 769px) and (max-width: 1024px) {
+            .features-grid { grid-template-columns: repeat(2, 1fr); }
+        }
+    </style>
+</head>
+<body>
+
+<!-- Stars -->
+<div class="stars" id="stars"></div>
+
+<!-- Nav -->
+<nav>
+    <a href="#" class="nav-logo">
+        <div class="nav-logo-dot"></div>
+        <span>NotKutum</span>
+    </a>
+    <div class="nav-links">
+        <a href="#features">Özellikler</a>
+        <a href="#how">Nasıl Çalışır</a>
+        <a href="#contact">İletişim</a>
+    </div>
+    <div class="nav-cta">
+        <a href="/Account/Login" class="btn-ghost">Giriş Yap</a>
+        <a href="/Account/Register" class="btn-primary">Ücretsiz Başla</a>
+    </div>
+    <button class="hamburger" id="hamburger" aria-label="Menü">
+        <span></span><span></span><span></span>
+    </button>
+</nav>
+
+<!-- Mobile Menu -->
+<div class="mobile-menu" id="mobileMenu">
+    <a href="#features" onclick="closeMobile()">Özellikler</a>
+    <a href="#how" onclick="closeMobile()">Nasıl Çalışır</a>
+    <a href="#contact" onclick="closeMobile()">İletişim</a>
+    <div class="mobile-btns">
+        <a href="/Account/Login" class="btn-ghost">Giriş Yap</a>
+        <a href="/Account/Register" class="btn-primary">Ücretsiz Başla</a>
+    </div>
+</div>
+
+<!-- Hero -->
+<section class="hero">
+    <div class="hero-badge">
+        <div class="hero-badge-dot"></div>
+        Şimdi yayında — Ücretsiz kullan
+    </div>
+    <h1>Notlarını bir <span class="accent">kutuda</span> topla.</h1>
+    <p>Fikirlerini, görevlerini ve notlarını düzenle. Hızlı, sade, güvenli. Hesap aç ve hemen başla.</p>
+    <div class="hero-btns">
+        <a href="/Account/Register" class="btn-primary">
+            <i class="bi bi-rocket-takeoff"></i>
+            Ücretsiz Başla
+        </a>
+        <a href="#features" class="btn-ghost">Özellikleri Gör</a>
+    </div>
+    <div class="hero-scroll">
+        <i class="bi bi-chevron-down"></i>
+        Aşağı kaydır
+    </div>
+</section>
+
+<!-- Features -->
+<section class="features" id="features">
+    <div class="section-label">Özellikler</div>
+    <div class="section-title">İhtiyacın olan her şey</div>
+    <p class="section-sub">Karmaşık araçlara gerek yok. NotKutum sade, hızlı ve odaklanmana yardımcı.</p>
+
+    <div class="features-grid">
+        <div class="feature-card">
+            <div class="feature-icon"><i class="bi bi-sticky"></i></div>
+            <h3>Hızlı Not Alma</h3>
+            <p>Aklına gelen fikri anında kaydet. Sade editör, dikkatini dağıtmaz.</p>
+        </div>
+        <div class="feature-card">
+            <div class="feature-icon"><i class="bi bi-folder2-open"></i></div>
+            <h3>Kategorilere Ayır</h3>
+            <p>Notlarını klasörler ve etiketlerle organize et. İstediğini saniyeler içinde bul.</p>
+        </div>
+        <div class="feature-card">
+            <div class="feature-icon"><i class="bi bi-shield-lock"></i></div>
+            <h3>Güvenli Hesap</h3>
+            <p>Notların sadece sana ait. Hesabınla her cihazdan erişebilirsin.</p>
+        </div>
+        <div class="feature-card">
+            <div class="feature-icon"><i class="bi bi-moon-stars"></i></div>
+            <h3>Karanlık / Açık Tema</h3>
+            <p>Gözüne hangisi rahat geliyorsa onu seç. Tercih kaydedilir.</p>
+        </div>
+        <div class="feature-card">
+            <div class="feature-icon"><i class="bi bi-search"></i></div>
+            <h3>Anlık Arama</h3>
+            <p>Yüzlerce not arasında yaz, bul. Beklemene gerek yok.</p>
+        </div>
+        <div class="feature-card">
+            <div class="feature-icon"><i class="bi bi-phone"></i></div>
+            <h3>Her Cihazda Çalışır</h3>
+            <p>Telefon, tablet, bilgisayar. Responsive tasarım, her ekranda kusursuz.</p>
+        </div>
+    </div>
+</section>
+
+<!-- How it works -->
+<section class="how" id="how">
+    <div class="section-label">Nasıl Çalışır</div>
+    <div class="section-title">3 adımda başla</div>
+    <p class="section-sub">Kayıt olmak dakika almaz. Hemen notlarını almaya başla.</p>
+
+    <div class="steps">
+        <div class="step">
+            <div class="step-num">1</div>
+            <div class="step-content">
+                <h3>Ücretsiz hesap oluştur</h3>
+                <p>Kullanıcı adı, e-posta ve şifre. Başka bir şey istemiyoruz.</p>
+            </div>
+        </div>
+        <div class="step">
+            <div class="step-num">2</div>
+            <div class="step-content">
+                <h3>İlk notunu ekle</h3>
+                <p>Giriş yaptıktan sonra seni panel karşılar. Hemen yeni not oluştur.</p>
+            </div>
+        </div>
+        <div class="step">
+            <div class="step-num">3</div>
+            <div class="step-content">
+                <h3>Düzenle, eriş, paylaş</h3>
+                <p>Notlarını kategorilere ayır, istediğin zaman düzenle, her cihazdan eriş.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- CTA -->
+<section class="cta-section">
+    <div class="cta-box">
+        <h2>Bugün başlamak<br>için bir neden yok mu?</h2>
+        <p>Ücretsiz, reklamsız, sade. Notlarını bir yerde toplamak için tek ihtiyacın bir hesap.</p>
+        <a href="/Account/Register" class="btn-primary">
+            <i class="bi bi-arrow-right-circle"></i>
+            Hesap Oluştur
+        </a>
+    </div>
+</section>
+
+<!-- Footer -->
+<footer id="contact">
+    <a href="#" class="footer-logo">
+        <div class="nav-logo-dot"></div>
+        <span>NotKutum</span>
+    </a>
+    <div class="footer-links">
+        <a href="#features">Özellikler</a>
+        <a href="#how">Nasıl Çalışır</a>
+        <a href="mailto:destek@notkutum.com">İletişim</a>
+    </div>
+    <div class="footer-copy">© 2026 NotKutum</div>
+</footer>
+
+<script>
+    // Stars
+    const container = document.getElementById('stars');
+    for (let i = 0; i < 120; i++) {
+        const s = document.createElement('div');
+        s.className = 'star';
+        const size = Math.random() * 2 + 0.5;
+        s.style.cssText = `
+            width:${size}px; height:${size}px;
+            top:${Math.random()*100}%; left:${Math.random()*100}%;
+            --d:${2+Math.random()*4}s;
+            --o:${0.1+Math.random()*0.6};
+            animation-delay:${Math.random()*4}s;
+        `;
+        container.appendChild(s);
+    }
+
+    // Hamburger
+    const hamburger = document.getElementById('hamburger');
+    const mobileMenu = document.getElementById('mobileMenu');
+    hamburger.addEventListener('click', () => {
+        mobileMenu.classList.toggle('open');
+    });
+    function closeMobile() {
+        mobileMenu.classList.remove('open');
+    }
+</script>
+
+</body>
+</html>

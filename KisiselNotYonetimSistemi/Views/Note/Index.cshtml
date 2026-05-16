@@ -1,0 +1,228 @@
+﻿@model List<KisiselNotYonetimSistemi.Entity.Concrete.Note>
+@{
+    ViewData["Title"] = "Notlarım";
+}
+
+<style>
+    .note-card {
+        border: none;
+        border-radius: 16px;
+        transition: transform 0.2s, box-shadow 0.2s;
+        cursor: pointer;
+    }
+    .note-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 12px 32px rgba(0,0,0,0.1) !important;
+    }
+    .note-title {
+        font-weight: 700;
+        font-size: 1rem;
+        color: inherit;
+        margin-bottom: 8px;
+    }
+    .note-preview {
+        color: inherit;
+        opacity: 0.7;
+        font-size: 0.85rem;
+        line-height: 1.6;
+        margin-bottom: 16px;
+    }
+    .note-date {
+        font-size: 0.78rem;
+        opacity: 0.6;
+    }
+    .note-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+        margin-top: 16px;
+        padding-top: 16px;
+        border-top: 1px solid rgba(128,128,128,0.15);
+    }
+    .btn-action {
+        border-radius: 8px;
+        padding: 6px 10px;
+        font-size: 0.8rem;
+        font-weight: 500;
+        border: none;
+        transition: opacity 0.15s;
+        white-space: nowrap;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+    }
+    .btn-action:hover { opacity: 0.85; }
+    .btn-view    { background: rgba(99,102,241,0.1);  color: #6366f1; }
+    .btn-edit    { background: rgba(245,158,11,0.1);  color: #f59e0b; }
+    .btn-delete  { background: rgba(239,68,68,0.1);   color: #ef4444; }
+    .btn-archive { background: rgba(16,185,129,0.1);  color: #10b981; }
+    .btn-pin     { background: rgba(99,102,241,0.08); color: #6366f1; }
+    .active-pin  { background: rgba(99,102,241,0.2);  color: #6366f1; font-weight: 700; }
+
+    .note-accent {
+        height: 4px;
+        border-radius: 16px 16px 0 0;
+    }
+    .page-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 28px;
+        gap: 12px;
+    }
+    .page-header h5 {
+        font-weight: 700;
+        font-size: 1.3rem;
+        color: inherit;
+        margin: 0;
+    }
+    .btn-new {
+        background: linear-gradient(135deg, #6366f1, #8b5cf6);
+        color: white;
+        border: none;
+        border-radius: 10px;
+        padding: 10px 20px;
+        font-size: 0.88rem;
+        font-weight: 600;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        flex-shrink: 0;
+        transition: opacity 0.2s, transform 0.1s;
+    }
+    .btn-new:hover { opacity: 0.9; color: white; transform: translateY(-1px); }
+
+    .empty-state {
+        text-align: center;
+        padding: 80px 0;
+        color: #9ca3af;
+    }
+    .empty-state i {
+        font-size: 3.5rem;
+        margin-bottom: 16px;
+        display: block;
+        color: #d1d5db;
+    }
+    .empty-state p { font-size: 1rem; margin-bottom: 20px; }
+
+    .note-count {
+        background: rgba(99,102,241,0.1);
+        color: #6366f1;
+        border-radius: 20px;
+        padding: 2px 12px;
+        font-size: 0.82rem;
+        font-weight: 600;
+        margin-left: 10px;
+    }
+    .note-card.pinned {
+        box-shadow: 0 0 0 2px #6366f1 !important;
+        background: rgba(99,102,241,0.04) !important;
+    }
+    .pin-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        font-size: 0.72rem;
+        font-weight: 700;
+        color: #6366f1;
+        background: rgba(99,102,241,0.12);
+        border-radius: 6px;
+        padding: 2px 8px;
+        margin-bottom: 8px;
+    }
+
+    @@media (max-width: 768px) {
+        .page-header h5 { font-size: 1.1rem; }
+        .btn-new { padding: 8px 14px; font-size: 0.82rem; }
+        .btn-action { padding: 5px 8px; font-size: 0.75rem; }
+        .card-body { padding: 16px !important; }
+    }
+</style>
+
+<div class="page-header">
+    <h5>
+        Tüm Notlarım
+        @if (Model != null && Model.Count > 0)
+        {
+            <span class="note-count">@Model.Count not</span>
+        }
+    </h5>
+    <a asp-action="Add" class="btn-new">
+        <i class="bi bi-plus-lg"></i> Yeni Not
+    </a>
+</div>
+
+@if (Model != null && Model.Count > 0)
+{
+    <div class="row g-4">
+        @{
+            var colors = new[] { "#6366f1", "#10b981", "#f59e0b", "#ef4444", "#8b5cf6", "#06b6d4" };
+            int i = 0;
+        }
+        @foreach (var note in Model)
+        {
+            var color = colors[i % colors.Length];
+            i++;
+            <div class="col-12 col-sm-6 col-lg-4">
+                <div class="card note-card shadow-sm h-100 @(note.IsPinned ? "pinned" : "")">
+                    <div class="note-accent" style="background:@(note.IsPinned ? "#6366f1" : color)"></div>
+                    <div class="card-body p-4">
+                        @if (note.IsPinned)
+                        {
+                            <div class="pin-badge">
+                                <i class="bi bi-pin-fill"></i> Sabitlendi
+                            </div>
+                        }
+                        <div class="note-title">@note.Title</div>
+                        <div class="note-preview">
+                            @(note.Content?.Length > 100 ? note.Content.Substring(0, 100) + "..." : note.Content)
+                        </div>
+                        <div class="note-date">
+                            <i class="bi bi-calendar3 me-1"></i>
+                            @note.CreatedDate.ToString("dd MMM yyyy")
+                        </div>
+                        <div class="note-actions">
+                            <a asp-action="Detail" asp-route-id="@note.NoteID" class="btn-action btn-view">
+                                <i class="bi bi-eye me-1"></i>Görüntüle
+                            </a>
+                            <a asp-action="Edit" asp-route-id="@note.NoteID" class="btn-action btn-edit">
+                                <i class="bi bi-pencil me-1"></i>Düzenle
+                            </a>
+                            @if (note.IsPinned)
+                            {
+                                <a asp-action="Unpin" asp-route-id="@note.NoteID" class="btn-action btn-pin active-pin">
+                                    <i class="bi bi-pin-angle-fill me-1"></i>Sabit
+                                </a>
+                            }
+                            else
+                            {
+                                <a asp-action="Pin" asp-route-id="@note.NoteID" class="btn-action btn-pin">
+                                    <i class="bi bi-pin-angle me-1"></i>Sabitle
+                                </a>
+                            }
+                            <a href="/Note/Archive/@note.NoteID" class="btn-action btn-archive"
+                               onclick="event.preventDefault(); showConfirm('Not arşive taşınsın mı?', this.href, 'archive')">
+                                <i class="bi bi-archive me-1"></i>Arşivle
+                            </a>
+                            <a href="/Note/SoftDelete/@note.NoteID" class="btn-action btn-delete"
+                               onclick="event.preventDefault(); showConfirm('Not çöp kutusuna taşınacak.', this.href, 'danger')">
+                                <i class="bi bi-trash me-1"></i>Sil
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+}
+else
+{
+    <div class="empty-state">
+        <i class="bi bi-journal-x"></i>
+        <p>Henüz hiç notun yok.</p>
+        <a asp-action="Add" class="btn-new">
+            <i class="bi bi-plus-lg"></i> İlk Notunu Ekle
+        </a>
+    </div>
+}

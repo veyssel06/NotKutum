@@ -1,0 +1,160 @@
+﻿@model List<KisiselNotYonetimSistemi.Entity.Concrete.Category>
+@{
+    ViewData["Title"] = "Kategoriler";
+}
+
+<style>
+    .page-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 28px;
+        gap: 12px;
+    }
+    .page-header h5 {
+        font-weight: 700;
+        font-size: 1.3rem;
+        margin: 0;
+    }
+    .btn-new {
+        background: linear-gradient(135deg, #10b981, #059669);
+        color: white;
+        border: none;
+        border-radius: 10px;
+        padding: 10px 20px;
+        font-size: 0.88rem;
+        font-weight: 600;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        flex-shrink: 0;
+        transition: opacity 0.2s, transform 0.1s;
+    }
+    .btn-new:hover { opacity: 0.9; color: white; transform: translateY(-1px); }
+    .cat-table { border: none; border-radius: 16px; overflow: hidden; }
+    .cat-table table { margin: 0; }
+    .cat-table thead tr th {
+        font-size: 0.78rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        padding: 14px 20px;
+        border: none;
+    }
+    .cat-table tbody tr td {
+        padding: 16px 20px;
+        border-color: rgba(0,0,0,0.05);
+        vertical-align: middle;
+    }
+    .cat-table tbody tr:last-child td { border: none; }
+    .cat-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        background: rgba(16,185,129,0.1);
+        color: #10b981;
+        border-radius: 20px;
+        padding: 4px 14px;
+        font-size: 0.85rem;
+        font-weight: 600;
+    }
+    .cat-badge i { font-size: 0.75rem; }
+    .btn-action {
+        border-radius: 8px;
+        padding: 6px 10px;
+        font-size: 0.8rem;
+        font-weight: 500;
+        border: none;
+        transition: opacity 0.15s;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        white-space: nowrap;
+    }
+    .btn-action:hover { opacity: 0.8; }
+    .btn-edit { background: rgba(245,158,11,0.1); color: #f59e0b; }
+    .btn-delete { background: rgba(239,68,68,0.1); color: #ef4444; }
+    .cat-count {
+        background: rgba(16,185,129,0.1);
+        color: #10b981;
+        border-radius: 20px;
+        padding: 2px 12px;
+        font-size: 0.82rem;
+        font-weight: 600;
+        margin-left: 10px;
+    }
+    .empty-state { text-align: center; padding: 80px 0; color: #9ca3af; }
+    .empty-state i { font-size: 3.5rem; margin-bottom: 16px; display: block; color: #d1d5db; }
+
+    @@media (max-width: 768px) {
+        .page-header h5 { font-size: 1.1rem; }
+        .btn-new { padding: 8px 14px; font-size: 0.82rem; }
+        .cat-table thead tr th:first-child,
+        .cat-table tbody tr td:first-child { display: none; }
+        .cat-table thead tr th,
+        .cat-table tbody tr td { padding: 12px 14px; }
+    }
+</style>
+
+<div class="page-header">
+    <h5>
+        Tüm Kategoriler
+        @if (Model != null && Model.Count > 0)
+        {
+            <span class="cat-count">@Model.Count kategori</span>
+        }
+    </h5>
+    <a asp-action="Add" class="btn-new">
+        <i class="bi bi-plus-lg"></i> Yeni Kategori
+    </a>
+</div>
+
+@if (Model != null && Model.Count > 0)
+{
+    <div class="card shadow-sm cat-table">
+        <table class="table table-hover">
+            <thead class="table-light">
+                <tr>
+                    <th>#</th>
+                    <th>Kategori Adı</th>
+                    <th class="text-end">İşlemler</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var cat in Model)
+                {
+                    <tr>
+                        <td class="text-muted" style="width:60px">@cat.CategoryID</td>
+                        <td>
+                            <span class="cat-badge">
+                                <i class="bi bi-tag-fill"></i>
+                                @cat.CategoryName
+                            </span>
+                        </td>
+                        <td class="text-end">
+                            <a asp-action="Edit" asp-route-id="@cat.CategoryID" class="btn-action btn-edit me-1">
+                                <i class="bi bi-pencil"></i> Düzenle
+                            </a>
+                            <a asp-action="Delete" asp-route-id="@cat.CategoryID" class="btn-action btn-delete"
+                               onclick="return confirm('Kategoriyi silmek istediğinize emin misiniz?')">
+                                <i class="bi bi-trash"></i> Sil
+                            </a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}
+else
+{
+    <div class="empty-state">
+        <i class="bi bi-tags"></i>
+        <p>Henüz kategori eklenmemiş.</p>
+        <a asp-action="Add" class="btn-new">
+            <i class="bi bi-plus-lg"></i> İlk Kategoriyi Ekle
+        </a>
+    </div>
+}
