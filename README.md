@@ -55,13 +55,13 @@ KisiselNotYonetimSistemi/
 ![Dashboard](KisiselNotYonetimSistemi/screenshots/2-dashboard.png)
 
 ### Yeni Not Ekle
-![Yeni Not](KisiselNotYonetimSistemi/screenshots3-yeni-not.png)
+![Yeni Not](KisiselNotYonetimSistemi/screenshots/3-yeni-not.png)
 
 ### Kategoriler
-![Kategoriler](KisiselNotYonetimSistemi/screenshots4-kategoriler.png)
+![Kategoriler](KisiselNotYonetimSistemi/screenshots/4-kategoriler.png)
 
 ### Yeni Kategori
-![Yeni Kategori](KisiselNotYonetimSistemi/screenshots5-yeni-kategori.png)
+![Yeni Kategori](KisiselNotYonetimSistemi/screenshots/5-yeni-kategori.png)
 
 ---
 
