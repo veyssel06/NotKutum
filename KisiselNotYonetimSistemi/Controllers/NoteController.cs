@@ -13,22 +13,46 @@ namespace KisiselNotYonetimSistemi.Controllers
 
         private int GetUserID() => HttpContext.Session.GetInt32("UserID") ?? 0;
 
-        public IActionResult Index()
+        public IActionResult Index(string sort = "date_desc", int? categoryId = null)
         {
-            var notes = _noteManager.GetAll(x => x.UserID == GetUserID()
+            var userId = GetUserID();
+            var allNotes = _noteManager.GetAll(x => x.UserID == userId
                                               && !x.IsArchived
                                               && !x.IsDeleted)
-                                    .OrderByDescending(x => x.IsPinned)
-                                    .ThenByDescending(x => x.CreatedDate)
-                                    .ToList();
+                                       .AsQueryable();
+
+            // Kategori filtresi
+            if (categoryId.HasValue)
+                allNotes = allNotes.Where(x => x.CategoryID == categoryId.Value);
+
+            List<Note> notes = sort switch
+            {
+                "date_asc" => allNotes.OrderByDescending(x => x.IsPinned).ThenBy(x => x.CreatedDate).ToList(),
+                "title_asc" => allNotes.OrderByDescending(x => x.IsPinned).ThenBy(x => x.Title).ToList(),
+                "title_desc" => allNotes.OrderByDescending(x => x.IsPinned).ThenByDescending(x => x.Title).ToList(),
+                _ => allNotes.OrderByDescending(x => x.IsPinned).ThenByDescending(x => x.CreatedDate).ToList()
+            };
+
+            ViewBag.Sort = sort;
+            ViewBag.CategoryId = categoryId;
+            ViewBag.Categories = _categoryManager.GetAll(x => x.UserID == userId);
             ViewData["Title"] = "Notlarım";
             return View(notes);
         }
-
         [HttpGet]
         public IActionResult Add()
         {
-            ViewBag.Categories = _categoryManager.GetAll(x => x.UserID == GetUserID());
+            var userId = GetUserID();
+            var categories = _categoryManager.GetAll(x => x.UserID == userId);
+
+            // Hiç kategorisi yoksa kategori ekleme sayfasına yönlendir
+            if (!categories.Any())
+            {
+                TempData["Warning"] = "Not eklemeden önce en az bir kategori oluşturmalısınız.";
+                return RedirectToAction("Add", "Category");
+            }
+
+            ViewBag.Categories = categories;
             ViewData["Title"] = "Yeni Not";
             return View();
         }

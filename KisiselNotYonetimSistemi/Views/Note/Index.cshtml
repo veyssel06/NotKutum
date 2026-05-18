@@ -1,6 +1,7 @@
 ﻿@model List<KisiselNotYonetimSistemi.Entity.Concrete.Note>
 @{
     ViewData["Title"] = "Notlarım";
+    string currentSort = ViewBag.Sort as string ?? "date_desc";
 }
 
 <style>
@@ -10,16 +11,19 @@
         transition: transform 0.2s, box-shadow 0.2s;
         cursor: pointer;
     }
-    .note-card:hover {
-        transform: translateY(-4px);
-        box-shadow: 0 12px 32px rgba(0,0,0,0.1) !important;
-    }
+
+        .note-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 32px rgba(0,0,0,0.1) !important;
+        }
+
     .note-title {
         font-weight: 700;
         font-size: 1rem;
         color: inherit;
         margin-bottom: 8px;
     }
+
     .note-preview {
         color: inherit;
         opacity: 0.7;
@@ -27,10 +31,12 @@
         line-height: 1.6;
         margin-bottom: 16px;
     }
+
     .note-date {
         font-size: 0.78rem;
         opacity: 0.6;
     }
+
     .note-actions {
         display: flex;
         flex-wrap: wrap;
@@ -39,6 +45,7 @@
         padding-top: 16px;
         border-top: 1px solid rgba(128,128,128,0.15);
     }
+
     .btn-action {
         border-radius: 8px;
         padding: 6px 10px;
@@ -51,18 +58,47 @@
         display: inline-flex;
         align-items: center;
     }
-    .btn-action:hover { opacity: 0.85; }
-    .btn-view    { background: rgba(99,102,241,0.1);  color: #6366f1; }
-    .btn-edit    { background: rgba(245,158,11,0.1);  color: #f59e0b; }
-    .btn-delete  { background: rgba(239,68,68,0.1);   color: #ef4444; }
-    .btn-archive { background: rgba(16,185,129,0.1);  color: #10b981; }
-    .btn-pin     { background: rgba(99,102,241,0.08); color: #6366f1; }
-    .active-pin  { background: rgba(99,102,241,0.2);  color: #6366f1; font-weight: 700; }
+
+        .btn-action:hover {
+            opacity: 0.85;
+        }
+
+    .btn-view {
+        background: rgba(99,102,241,0.1);
+        color: #6366f1;
+    }
+
+    .btn-edit {
+        background: rgba(245,158,11,0.1);
+        color: #f59e0b;
+    }
+
+    .btn-delete {
+        background: rgba(239,68,68,0.1);
+        color: #ef4444;
+    }
+
+    .btn-archive {
+        background: rgba(16,185,129,0.1);
+        color: #10b981;
+    }
+
+    .btn-pin {
+        background: rgba(99,102,241,0.08);
+        color: #6366f1;
+    }
+
+    .active-pin {
+        background: rgba(99,102,241,0.2);
+        color: #6366f1;
+        font-weight: 700;
+    }
 
     .note-accent {
         height: 4px;
         border-radius: 16px 16px 0 0;
     }
+
     .page-header {
         display: flex;
         justify-content: space-between;
@@ -70,12 +106,14 @@
         margin-bottom: 28px;
         gap: 12px;
     }
-    .page-header h5 {
-        font-weight: 700;
-        font-size: 1.3rem;
-        color: inherit;
-        margin: 0;
-    }
+
+        .page-header h5 {
+            font-weight: 700;
+            font-size: 1.3rem;
+            color: inherit;
+            margin: 0;
+        }
+
     .btn-new {
         background: linear-gradient(135deg, #6366f1, #8b5cf6);
         color: white;
@@ -91,20 +129,46 @@
         flex-shrink: 0;
         transition: opacity 0.2s, transform 0.1s;
     }
-    .btn-new:hover { opacity: 0.9; color: white; transform: translateY(-1px); }
+
+        .btn-new:hover {
+            opacity: 0.9;
+            color: white;
+            transform: translateY(-1px);
+        }
+
+    .sort-select {
+        border-radius: 10px;
+        border: 1.5px solid rgba(128,128,128,0.3);
+        padding: 8px 14px;
+        font-size: 0.85rem;
+        font-weight: 500;
+        background: transparent;
+        color: inherit;
+        cursor: pointer;
+    }
+
+        .sort-select option {
+            background: #1a1a2e;
+            color: #ffffff;
+        }
 
     .empty-state {
         text-align: center;
         padding: 80px 0;
         color: #9ca3af;
     }
-    .empty-state i {
-        font-size: 3.5rem;
-        margin-bottom: 16px;
-        display: block;
-        color: #d1d5db;
-    }
-    .empty-state p { font-size: 1rem; margin-bottom: 20px; }
+
+        .empty-state i {
+            font-size: 3.5rem;
+            margin-bottom: 16px;
+            display: block;
+            color: #d1d5db;
+        }
+
+        .empty-state p {
+            font-size: 1rem;
+            margin-bottom: 20px;
+        }
 
     .note-count {
         background: rgba(99,102,241,0.1);
@@ -115,10 +179,11 @@
         font-weight: 600;
         margin-left: 10px;
     }
+
     .note-card.pinned {
         box-shadow: 0 0 0 2px #6366f1 !important;
-        background: rgba(99,102,241,0.04) !important;
     }
+
     .pin-badge {
         display: inline-flex;
         align-items: center;
@@ -133,10 +198,32 @@
     }
 
     @@media (max-width: 768px) {
-        .page-header h5 { font-size: 1.1rem; }
-        .btn-new { padding: 8px 14px; font-size: 0.82rem; }
-        .btn-action { padding: 5px 8px; font-size: 0.75rem; }
-        .card-body { padding: 16px !important; }
+        .page-header {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+            .page-header h5 {
+                font-size: 1.1rem;
+            }
+
+        .btn-new {
+            padding: 8px 14px;
+            font-size: 0.82rem;
+        }
+
+        .btn-action {
+            padding: 5px 8px;
+            font-size: 0.75rem;
+        }
+
+        .card-body {
+            padding: 16px !important;
+        }
+
+        .d-flex.align-items-center.gap-2 {
+            flex-wrap: wrap;
+        }
     }
 </style>
 
@@ -148,25 +235,42 @@
             <span class="note-count">@Model.Count not</span>
         }
     </h5>
-    <a asp-action="Add" class="btn-new">
-        <i class="bi bi-plus-lg"></i> Yeni Not
-    </a>
+    <div class="d-flex align-items-center gap-2">
+        <!-- Kategori Filtresi -->
+        <select class="sort-select" onchange="window.location='/Note/Index?sort=@currentSort&categoryId='+this.value">
+            <option value="">Tüm Kategoriler</option>
+            @foreach (var cat in (ViewBag.Categories as List<KisiselNotYonetimSistemi.Entity.Concrete.Category> ?? new()))
+            {
+                <option value="@cat.CategoryID" selected="@(ViewBag.CategoryId != null && (int)ViewBag.CategoryId == cat.CategoryID)">
+                    @cat.CategoryName
+                </option>
+            }
+        </select>
+
+        <!-- Sıralama -->
+        <select class="sort-select" onchange="window.location='/Note/Index?sort='+this.value+'&categoryId=@ViewBag.CategoryId'">
+            <option value="date_desc" selected="@(currentSort == "date_desc")">En Yeni</option>
+            <option value="date_asc" selected="@(currentSort == "date_asc")">En Eski</option>
+            <option value="title_asc" selected="@(currentSort == "title_asc")">A → Z</option>
+            <option value="title_desc" selected="@(currentSort == "title_desc")">Z → A</option>
+        </select>
+
+        <a asp-action="Add" class="btn-new">
+            <i class="bi bi-plus-lg"></i> Yeni Not
+        </a>
+    </div>
 </div>
 
 @if (Model != null && Model.Count > 0)
 {
     <div class="row g-4">
-        @{
-            var colors = new[] { "#6366f1", "#10b981", "#f59e0b", "#ef4444", "#8b5cf6", "#06b6d4" };
-            int i = 0;
-        }
         @foreach (var note in Model)
         {
-            var color = colors[i % colors.Length];
-            i++;
+            var noteColor = string.IsNullOrEmpty(note.Color) ? "#ffffff" : note.Color;
             <div class="col-12 col-sm-6 col-lg-4">
-                <div class="card note-card shadow-sm h-100 @(note.IsPinned ? "pinned" : "")">
-                    <div class="note-accent" style="background:@(note.IsPinned ? "#6366f1" : color)"></div>
+                <div class="card note-card shadow-sm h-100 @(note.IsPinned ? "pinned" : "")"
+                     style="background-color:@noteColor !important; color:#1a1a2e !important;">
+                    <div class="note-accent" style="background:@(note.IsPinned ? "#6366f1" : noteColor); filter:brightness(0.8);"></div>
                     <div class="card-body p-4">
                         @if (note.IsPinned)
                         {

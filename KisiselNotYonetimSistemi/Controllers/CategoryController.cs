@@ -22,6 +22,8 @@ namespace KisiselNotYonetimSistemi.Controllers
         [HttpGet]
         public IActionResult Add()
         {
+            if (TempData["Warning"] != null)
+                ViewBag.Warning = TempData["Warning"];
             ViewData["Title"] = "Yeni Kategori";
             return View();
         }

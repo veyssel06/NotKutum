@@ -13,6 +13,8 @@ namespace KisiselNotYonetimSistemi.Entity.Concrete
         public string Email { get; set; }
         public string Password { get; set; }
         public string Role { get; set; }
+        public string? RememberToken { get; set; }
+        public DateTime? TokenExpiry { get; set; }
         public bool UserStatus { get; set; }
         public ICollection<Note> Notes { get; set; }
 

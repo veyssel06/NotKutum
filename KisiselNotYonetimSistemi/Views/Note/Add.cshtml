@@ -10,9 +10,11 @@
         max-width: 680px;
         width: 100%;
     }
-    .form-card .card-body {
-        padding: 36px;
-    }
+
+        .form-card .card-body {
+            padding: 36px;
+        }
+
     .page-title {
         font-weight: 700;
         font-size: 1.2rem;
@@ -21,23 +23,26 @@
         align-items: center;
         gap: 10px;
     }
-    .page-title .title-icon {
-        width: 40px;
-        height: 40px;
-        background: linear-gradient(135deg, #6366f1, #8b5cf6);
-        border-radius: 10px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: white;
-        font-size: 1rem;
-        flex-shrink: 0;
-    }
+
+        .page-title .title-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, #6366f1, #8b5cf6);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1rem;
+            flex-shrink: 0;
+        }
+
     .form-label {
         font-weight: 600;
         font-size: 0.85rem;
         margin-bottom: 6px;
     }
+
     .form-control, .form-select {
         border-radius: 10px;
         border: 1.5px solid #e5e7eb;
@@ -45,14 +50,17 @@
         font-size: 0.92rem;
         transition: border-color 0.2s, box-shadow 0.2s;
     }
-    .form-control:focus, .form-select:focus {
-        border-color: #6366f1;
-        box-shadow: 0 0 0 3px rgba(99,102,241,0.15);
-    }
+
+        .form-control:focus, .form-select:focus {
+            border-color: #6366f1;
+            box-shadow: 0 0 0 3px rgba(99,102,241,0.15);
+        }
+
     textarea.form-control {
         resize: vertical;
         min-height: 160px;
     }
+
     .btn-save {
         background: linear-gradient(135deg, #6366f1, #8b5cf6);
         border: none;
@@ -63,11 +71,13 @@
         color: white;
         transition: opacity 0.2s, transform 0.1s;
     }
-    .btn-save:hover {
-        opacity: 0.9;
-        color: white;
-        transform: translateY(-1px);
-    }
+
+        .btn-save:hover {
+            opacity: 0.9;
+            color: white;
+            transform: translateY(-1px);
+        }
+
     .btn-cancel {
         border-radius: 10px;
         padding: 11px 24px;
@@ -81,12 +91,69 @@
         display: inline-flex;
         align-items: center;
     }
-    .btn-cancel:hover { background: #f9fafb; }
+
+        .btn-cancel:hover {
+            background: #f9fafb;
+        }
+
+    /* Renk seçici */
+    .color-picker-row {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+    }
+
+    .color-option {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        border: 3px solid transparent;
+        cursor: pointer;
+        transition: transform 0.15s, border-color 0.15s;
+    }
+
+        .color-option:hover {
+            transform: scale(1.15);
+        }
+
+        .color-option.selected {
+            border-color: #6366f1;
+            transform: scale(1.15);
+        }
+
+    /* Karakter sayacı */
+    .char-counter {
+        font-size: 0.78rem;
+        text-align: right;
+        margin-top: 4px;
+        transition: color 0.2s;
+    }
+
+        .char-counter.ok {
+            color: #10b981;
+        }
+
+        .char-counter.warn {
+            color: #f59e0b;
+        }
+
+        .char-counter.danger {
+            color: #ef4444;
+        }
 
     @@media (max-width: 768px) {
-        .form-card .card-body { padding: 20px; }
-        .btn-save, .btn-cancel { width: 100%; justify-content: center; }
-        .d-flex.gap-3 { flex-direction: column; }
+        .form-card .card-body {
+            padding: 20px;
+        }
+
+        .btn-save, .btn-cancel {
+            width: 100%;
+            justify-content: center;
+        }
+
+        .d-flex.gap-3 {
+            flex-direction: column;
+        }
     }
 </style>
 
@@ -112,10 +179,11 @@
             </div>
             <div class="mb-3">
                 <label class="form-label">İçerik</label>
-                <textarea name="Content" class="form-control"
+                <textarea name="Content" id="contentArea" class="form-control"
                           placeholder="Not içeriğini buraya yazın...">@Model?.Content</textarea>
+                <div class="char-counter ok" id="charCounter">0 karakter</div>
             </div>
-            <div class="mb-4">
+            <div class="mb-3">
                 <label class="form-label">Kategori</label>
                 <select name="CategoryID" class="form-select">
                     <option value="">-- Kategori Seç --</option>
@@ -125,14 +193,48 @@
                     }
                 </select>
             </div>
+            <div class="mb-4">
+                <label class="form-label">Not Rengi</label>
+                <div class="color-picker-row">
+                    @foreach (var color in new[] { "#ffffff", "#fef9c3", "#dcfce7", "#dbeafe", "#fce7f3", "#ede9fe", "#ffedd5", "#f1f5f9" })
+                    {
+                        <div class="color-option @(color == "#ffffff" ? "selected" : "")"
+                             style="background:@color;"
+                             onclick="selectColor('@color', this)"
+                             title="@color">
+                        </div>
+                    }
+                </div>
+                <input type="hidden" name="Color" id="colorInput" value="#ffffff" />
+            </div>
             <div class="d-flex gap-3">
                 <button type="submit" class="btn-save">
                     <i class="bi bi-check-lg me-1"></i> Kaydet
                 </button>
-                <a asp-action="Index" class="btn-cancel">
-                    İptal
-                </a>
+                <a asp-action="Index" class="btn-cancel">İptal</a>
             </div>
         </form>
     </div>
 </div>
+
+<script>
+    // Karakter sayacı
+    const contentArea = document.getElementById('contentArea');
+    const charCounter = document.getElementById('charCounter');
+
+    contentArea.addEventListener('input', function () {
+        const len = this.value.length;
+        charCounter.textContent = len + ' karakter';
+        charCounter.className = 'char-counter';
+        if (len < 500) charCounter.classList.add('ok');
+        else if (len < 1000) charCounter.classList.add('warn');
+        else charCounter.classList.add('danger');
+    });
+
+    // Renk seçici
+    function selectColor(color, el) {
+        document.querySelectorAll('.color-option').forEach(c => c.classList.remove('selected'));
+        el.classList.add('selected');
+        document.getElementById('colorInput').value = color;
+    }
+</script>

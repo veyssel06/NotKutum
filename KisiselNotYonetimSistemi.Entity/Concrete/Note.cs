@@ -11,6 +11,7 @@ namespace KisiselNotYonetimSistemi.Entity.Concrete
         public int NoteID { get; set; }
         public string Title { get; set; }
         public string? Content { get; set; }
+        public string? Color { get; set; } = "#ffffff";
         public DateTime CreatedDate { get; set; }
         public int UserID { get; set; }
         public int? CategoryID { get; set; }
